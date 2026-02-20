@@ -326,11 +326,15 @@ function Genim:CreateWindow(Config)
         ElasticBehavior = Enum.ElasticBehavior.Always
     })
     
-    Create("UIListLayout", {
+    local SideBarLayout = Create("UIListLayout", {
         Parent = SideBarList,
         Padding = UDim.new(0, 5),
         SortOrder = Enum.SortOrder.LayoutOrder
     })
+
+    SideBarLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        SideBarList.CanvasSize = UDim2.new(0, 0, 0, SideBarLayout.AbsoluteContentSize.Y)
+    end)
 
     -- Container
     local Container = Create("Frame", {
@@ -373,21 +377,27 @@ function Genim:CreateWindow(Config)
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
             Size = UDim2.new(1, 0, 1, 0),
-            ScrollBarThickness = 2,
+            ScrollBarThickness = 3,
             ScrollBarImageColor3 = Genim.Theme.AccentColor,
-            ScrollBarImageTransparency = 0.5,
+            ScrollBarImageTransparency = 0.2,
             Visible = false,
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             CanvasSize = UDim2.new(0, 0, 0, 0),
-            ElasticBehavior = Enum.ElasticBehavior.Always
+            ElasticBehavior = Enum.ElasticBehavior.Always,
+            ScrollingDirection = Enum.ScrollingDirection.Y
         })
         
-        Create("UIListLayout", {
+        local TabList = Create("UIListLayout", {
             Parent = TabContent,
             Padding = UDim.new(0, 8),
             SortOrder = Enum.SortOrder.LayoutOrder,
             HorizontalAlignment = Enum.HorizontalAlignment.Center
         })
+
+        -- Fallback for some environments where AutomaticCanvasSize fails
+        TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            TabContent.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 20)
+        end)
         
         Create("UIPadding", {
             Parent = TabContent,
