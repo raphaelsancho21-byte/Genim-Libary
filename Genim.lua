@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.2.5"
+Genim.Version = "v1.25.1"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -153,7 +153,21 @@ function Genim:Notify(Props)
     Props.Title = Props.Title or "Notification"
     Props.Content = Props.Content or "This is a notification message."
     Props.Duration = Props.Duration or 5
-    Props.Image = Props.Image or "rbxassetid://15132379512"
+    Props.Type = Props.Type or "Info" -- Success, Error, Warning, Info
+    
+    -- Type Configuration
+    local TypeData = {
+        Success = { Color = Color3.fromRGB(34, 197, 94), Image = "rbxassetid://15132379512" }, -- Checkmark
+        Error = { Color = Color3.fromRGB(239, 68, 68), Image = "rbxassetid://15132379512" }, -- Error
+        Warning = { Color = Color3.fromRGB(234, 179, 8), Image = "rbxassetid://15132379512" }, -- Alert
+        Info = { Color = Genim.Theme.AccentColor, Image = "rbxassetid://15132379512" } -- Info
+    }
+    
+    local Config = TypeData[Props.Type] or TypeData.Info
+    local AccentColor = Config.Color
+    local DefaultImage = Config.Image
+    
+    Props.Image = Props.Image or DefaultImage
     
     local NotificationGui = CoreGui:FindFirstChild("GenimNotifications")
     if not NotificationGui then
@@ -187,7 +201,8 @@ function Genim:Notify(Props)
         BorderSizePixel = 0,
         Size = UDim2.new(1, 0, 0, 0), -- Animated
         ClipsDescendants = true,
-        LayoutOrder = #Holder:GetChildren()
+        LayoutOrder = #Holder:GetChildren(),
+        Transparency = 1
     })
     
     Create("UICorner", {
@@ -198,7 +213,8 @@ function Genim:Notify(Props)
     Create("UIStroke", {
         Color = Genim.Theme.StrokeColor,
         Thickness = 1,
-        Parent = NoteBox
+        Parent = NoteBox,
+        Transparency = 1
     })
 
     local Title = Create("TextLabel", {
@@ -210,13 +226,14 @@ function Genim:Notify(Props)
         Text = Props.Title,
         TextColor3 = Genim.Theme.TextColor,
         TextSize = 13,
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Transparency = 1
     })
     
     Create("UIGradient", {
         Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            ColorSequenceKeypoint.new(0, AccentColor),
+            ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
         }),
         Parent = Title
     })
@@ -229,10 +246,11 @@ function Genim:Notify(Props)
         Font = Enum.Font.GothamMedium,
         Text = Props.Content,
         TextColor3 = Genim.Theme.SecondaryTextColor,
-        TextSize = 12,
+        TextSize = 11,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Top
+        TextYAlignment = Enum.TextYAlignment.Top,
+        Transparency = 1
     })
 
     local Icon = Create("ImageLabel", {
@@ -241,20 +259,55 @@ function Genim:Notify(Props)
         Position = UDim2.new(0, 10, 0, 10),
         Size = UDim2.new(0, 22, 0, 22),
         Image = Props.Image,
-        ImageColor3 = Genim.Theme.AccentColor
+        ImageColor3 = AccentColor,
+        Transparency = 1
     })
 
-    -- Animation
+    -- Progress Bar
+    local ProgressBack = Create("Frame", {
+        Name = "ProgressBack",
+        Parent = NoteBox,
+        BackgroundColor3 = Color3.fromRGB(30, 41, 59),
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 0, 1, -2),
+        Size = UDim2.new(1, 0, 0, 2)
+    })
+    
+    local ProgressBar = Create("Frame", {
+        Name = "ProgressBar",
+        Parent = ProgressBack,
+        BackgroundColor3 = AccentColor,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 1, 0)
+    })
+
+    -- Animation Logic
     Content.Size = UDim2.new(1, -50, 0, Content.TextBounds.Y)
     local TargetHeight = math.max(60, Content.TextBounds.Y + 35)
     
-    Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, TargetHeight)})
+    Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, TargetHeight), Transparency = 0})
+    Tween(Title, 0.4, {Transparency = 0})
+    Tween(Content, 0.4, {Transparency = 0})
+    Tween(Icon, 0.4, {Transparency = 0})
+    
+    -- Stroke Animation separately due to Instance.new bug with Stroke in older builds
+    task.spawn(function()
+        local stroke = NoteBox:FindFirstChild("UIStroke")
+        if stroke then Tween(stroke, 0.4, {Transparency = 0}) end
+    end)
+    
+    -- Progress Animation
+    Tween(ProgressBar, Props.Duration, {Size = UDim2.new(0, 0, 1, 0)})
     
     task.delay(Props.Duration, function()
-        Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1})
+        Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, 0), Transparency = 1})
+        Tween(Title, 0.4, {Transparency = 1})
+        Tween(Content, 0.4, {Transparency = 1})
+        Tween(Icon, 0.4, {Transparency = 1})
         task.wait(0.4)
         NoteBox:Destroy()
     end)
+end
 end
 
 function Genim:CreateWindow(Config)
