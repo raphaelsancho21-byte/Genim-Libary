@@ -997,7 +997,104 @@ function Genim:CreateWindow(Config)
         return Tab
     end
     
+    -- Loading Screen Implementation
+    local LoadingFrame = Create("Frame", {
+        Name = "LoadingFrame",
+        Parent = MainFrame,
+        BackgroundColor3 = Genim.Theme.MainColor,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 100
+    })
+    
+    Create("UICorner", {
+        CornerRadius = UDim.new(0, 10),
+        Parent = LoadingFrame
+    })
+
+    local LoadingTitle = Create("TextLabel", {
+        Parent = LoadingFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 0, 0, 120),
+        Size = UDim2.new(1, 0, 0, 30),
+        Font = Enum.Font.GothamBold,
+        Text = Config.LoadingTitle or Config.Name,
+        TextColor3 = Genim.Theme.TextColor,
+        TextSize = 24,
+        ZIndex = 101,
+        TextTransparency = 0
+    })
+    
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+        }),
+        Parent = LoadingTitle
+    })
+
+    local LoadingSubtitle = Create("TextLabel", {
+        Parent = LoadingFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 0, 0, 150),
+        Size = UDim2.new(1, 0, 0, 20),
+        Font = Enum.Font.GothamMedium,
+        Text = Config.LoadingSubtitle or "Iniciando Genim...",
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 14,
+        ZIndex = 101,
+        TextTransparency = 0
+    })
+
+    local ProgressBack = Create("Frame", {
+        Parent = LoadingFrame,
+        BackgroundColor3 = Color3.fromRGB(30, 41, 59),
+        Position = UDim2.new(0.5, -100, 0, 200),
+        Size = UDim2.new(0, 200, 0, 4),
+        ZIndex = 101
+    })
+    
+    Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = ProgressBack })
+
+    local ProgressFill = Create("Frame", {
+        Parent = ProgressBack,
+        BackgroundColor3 = Genim.Theme.AccentColor,
+        Size = UDim2.new(0, 0, 1, 0),
+        ZIndex = 102
+    })
+    
+    Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = ProgressFill })
+    
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+        }),
+        Parent = ProgressFill
+    })
+
+    -- Animate Loading
+    task.spawn(function()
+        local OldSize = MainFrame.Size
+        MainFrame.Size = UDim2.new(0, 0, 0, 0)
+        Tween(MainFrame, 0.5, {Size = OldSize})
+        task.wait(0.5)
+        
+        Tween(ProgressFill, 1.5, {Size = UDim2.new(1, 0, 1, 0)})
+        task.wait(1.7)
+        
+        Tween(LoadingFrame, 0.5, {BackgroundTransparency = 1})
+        Tween(LoadingTitle, 0.5, {TextTransparency = 1})
+        Tween(LoadingSubtitle, 0.5, {TextTransparency = 1})
+        Tween(ProgressBack, 0.5, {BackgroundTransparency = 1})
+        Tween(ProgressFill, 0.5, {BackgroundTransparency = 1})
+        
+        task.wait(0.5)
+        LoadingFrame:Destroy()
+    end)
+    
     return Window
 end
+
 
 return Genim
