@@ -310,7 +310,6 @@ function Genim:Notify(Props)
         NoteBox:Destroy()
     end)
 end
-end
 
 function Genim:CreateWindow(Config)
 
