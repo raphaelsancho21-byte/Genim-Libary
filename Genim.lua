@@ -1114,13 +1114,81 @@ function Genim:CreateWindow(Config)
         Parent = ProgressFill
     })
 
+    -- Toggle Logic
+    local Toggled = true
+    local Debounce = false
+    
+    function Window:Toggle(state)
+        if Debounce then return end
+        Debounce = true
+        
+        if state ~= nil then
+            Toggled = state
+        else
+            Toggled = not Toggled
+        end
+        
+        if Toggled then
+            MainFrame.Visible = true
+            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 500, 0, 350), Position = UDim2.new(0.5, 0, 0.5, 0)})
+        else
+            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
+            task.delay(0.4, function()
+                if not Toggled then MainFrame.Visible = false end
+            end)
+        end
+        
+        task.wait(0.4)
+        Debounce = false
+    end
+
+    -- Keybind Listener
+    local Keybind = Config.Keybind or Enum.KeyCode.K
+    UserInputService.InputBegan:Connect(function(input, gpe)
+        if not gpe and input.KeyCode == Keybind then
+            Window:Toggle()
+        end
+    end)
+
+    -- Mobile Toggle Button
+    local MobileToggle = Create("TextButton", {
+        Name = "MobileToggle",
+        Parent = ScreenGui,
+        BackgroundColor3 = Genim.Theme.MainColor,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0.5, -40, 0, 5),
+        Size = UDim2.new(0, 80, 0, 30),
+        Font = Enum.Font.GothamBold,
+        Text = "GENIM",
+        TextColor3 = Genim.Theme.TextColor,
+        TextSize = 12,
+        ZIndex = 500,
+        AutoButtonColor = false
+    })
+    
+    Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = MobileToggle })
+    Create("UIStroke", { Color = Genim.Theme.AccentColor, Thickness = 1.2, Parent = MobileToggle })
+    
+    local MobileGradient = Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+        }),
+        Parent = MobileToggle
+    })
+
+    MobileToggle.MouseButton1Click:Connect(function()
+        Ripple(MobileToggle)
+        Window:Toggle()
+    end)
+
     -- Animate Loading Function
     local function StartLoading()
         task.spawn(function()
             MainFrame.Visible = true
             Tween(MainFrame, 0.6, {
                 Size = UDim2.new(0, 500, 0, 350),
-                Position = UDim2.new(0.5, -250, 0.5, -175)
+                Position = UDim2.new(0.5, 0, 0.5, 0)
             })
             task.wait(0.6)
             
@@ -1347,7 +1415,7 @@ function Genim:CreateWindow(Config)
                     MainFrame.Visible = true
                     Tween(MainFrame, 0.6, {
                         Size = UDim2.new(0, 500, 0, 350),
-                        Position = UDim2.new(0.5, -250, 0.5, -175)
+                        Position = UDim2.new(0.5, 0, 0.5, 0)
                     })
                     task.wait(0.6)
                     StartLoading()
@@ -1361,7 +1429,7 @@ function Genim:CreateWindow(Config)
             MainFrame.Visible = true
             Tween(MainFrame, 0.6, {
                 Size = UDim2.new(0, 500, 0, 350),
-                Position = UDim2.new(0.5, -250, 0.5, -175)
+                Position = UDim2.new(0.5, 0, 0.5, 0)
             })
             task.wait(0.6)
             KeySystemFrame.Visible = true
