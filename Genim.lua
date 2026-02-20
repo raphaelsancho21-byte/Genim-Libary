@@ -233,10 +233,12 @@ function Genim:CreateWindow(Config)
         Parent = ScreenGui,
         BackgroundColor3 = Genim.Theme.MainColor,
         BorderSizePixel = 0,
-        Position = UDim2.new(0.5, -250, 0.5, -175),
-        Size = UDim2.new(0, 500, 0, 350),
-        ClipsDescendants = true
+        Position = UDim2.new(0.5, 0, 0.5, 0), -- Center it for the expansion animation
+        Size = UDim2.new(0, 0, 0, 0),
+        ClipsDescendants = true,
+        Visible = false
     })
+
     
     Create("UICorner", {
         CornerRadius = UDim.new(0, 10),
@@ -1075,13 +1077,15 @@ function Genim:CreateWindow(Config)
 
     -- Animate Loading
     task.spawn(function()
-        local OldSize = MainFrame.Size
-        MainFrame.Size = UDim2.new(0, 0, 0, 0)
-        Tween(MainFrame, 0.5, {Size = OldSize})
-        task.wait(0.5)
+        MainFrame.Visible = true
+        Tween(MainFrame, 0.6, {
+            Size = UDim2.new(0, 500, 0, 350),
+            Position = UDim2.new(0.5, -250, 0.5, -175)
+        })
+        task.wait(0.6)
         
-        Tween(ProgressFill, 1.5, {Size = UDim2.new(1, 0, 1, 0)})
-        task.wait(1.7)
+        Tween(ProgressFill, 1.2, {Size = UDim2.new(1, 0, 1, 0)})
+        task.wait(1.5)
         
         Tween(LoadingFrame, 0.5, {BackgroundTransparency = 1})
         Tween(LoadingTitle, 0.5, {TextTransparency = 1})
@@ -1095,6 +1099,7 @@ function Genim:CreateWindow(Config)
     
     return Window
 end
+
 
 
 return Genim
