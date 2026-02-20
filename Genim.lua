@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.2"
+Genim.Version = "v1.25.3"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -233,6 +233,34 @@ function Genim:CreateWindow(Config)
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left
     })
+
+    local CloseButton = Create("TextButton", {
+        Name = "CloseButton",
+        Parent = TopBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(1, -35, 0, 0),
+        Size = UDim2.new(0, 35, 1, 0),
+        Font = Enum.Font.GothamBold,
+        Text = "X",
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 14,
+        AutoButtonColor = false
+    })
+
+    CloseButton.MouseEnter:Connect(function()
+        Tween(CloseButton, 0.2, {TextColor3 = Color3.fromRGB(255, 100, 100)})
+    end)
+
+    CloseButton.MouseLeave:Connect(function()
+        Tween(CloseButton, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor})
+    end)
+
+    CloseButton.MouseButton1Click:Connect(function()
+        Ripple(CloseButton)
+        Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
+        task.wait(0.4)
+        ScreenGui:Destroy()
+    end)
     
     -- Gemini Gradient for Title or Accent
     local Gradient = Create("UIGradient", {
