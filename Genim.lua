@@ -6,7 +6,6 @@
 ]]
 
 local Genim = {}
-local Genim = {}
 Genim.Version = "v1.25.2"
 
 -- Services
