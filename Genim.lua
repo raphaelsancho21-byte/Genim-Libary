@@ -204,22 +204,6 @@ function Genim:CreateWindow(Config)
         BorderSizePixel = 0,
         Size = UDim2.new(1, 0, 0, 40)
     })
-    
-    Create("UICorner", {
-        CornerRadius = UDim.new(0, 10),
-        Parent = TopBar
-    })
-    
-    -- Hide bottom corners of TopBar
-    Create("Frame", {
-        Name = "CornerFix",
-        Parent = TopBar,
-        BackgroundColor3 = Genim.Theme.DarkerColor,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 0.5, 0),
-        Size = UDim2.new(1, 0, 0.5, 0),
-        ZIndex = 0
-    })
 
     local Title = Create("TextLabel", {
         Name = "Title",
