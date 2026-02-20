@@ -202,7 +202,7 @@ function Genim:Notify(Props)
         Size = UDim2.new(1, 0, 0, 0), -- Animated
         ClipsDescendants = true,
         LayoutOrder = #Holder:GetChildren(),
-        Transparency = 1
+        BackgroundTransparency = 1
     })
     
     Create("UICorner", {
@@ -210,7 +210,7 @@ function Genim:Notify(Props)
         Parent = NoteBox
     })
     
-    Create("UIStroke", {
+    local Stroke = Create("UIStroke", {
         Color = Genim.Theme.StrokeColor,
         Thickness = 1,
         Parent = NoteBox,
@@ -227,7 +227,7 @@ function Genim:Notify(Props)
         TextColor3 = Genim.Theme.TextColor,
         TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Transparency = 1
+        TextTransparency = 1
     })
     
     Create("UIGradient", {
@@ -250,7 +250,7 @@ function Genim:Notify(Props)
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Top,
-        Transparency = 1
+        TextTransparency = 1
     })
 
     local Icon = Create("ImageLabel", {
@@ -260,7 +260,7 @@ function Genim:Notify(Props)
         Size = UDim2.new(0, 22, 0, 22),
         Image = Props.Image,
         ImageColor3 = AccentColor,
-        Transparency = 1
+        ImageTransparency = 1
     })
 
     -- Progress Bar
@@ -270,7 +270,8 @@ function Genim:Notify(Props)
         BackgroundColor3 = Color3.fromRGB(30, 41, 59),
         BorderSizePixel = 0,
         Position = UDim2.new(0, 0, 1, -2),
-        Size = UDim2.new(1, 0, 0, 2)
+        Size = UDim2.new(1, 0, 0, 2),
+        BackgroundTransparency = 1
     })
     
     local ProgressBar = Create("Frame", {
@@ -278,32 +279,33 @@ function Genim:Notify(Props)
         Parent = ProgressBack,
         BackgroundColor3 = AccentColor,
         BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 1, 0)
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1
     })
 
     -- Animation Logic
     Content.Size = UDim2.new(1, -50, 0, Content.TextBounds.Y)
     local TargetHeight = math.max(60, Content.TextBounds.Y + 35)
     
-    Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, TargetHeight), Transparency = 0})
-    Tween(Title, 0.4, {Transparency = 0})
-    Tween(Content, 0.4, {Transparency = 0})
-    Tween(Icon, 0.4, {Transparency = 0})
-    
-    -- Stroke Animation separately due to Instance.new bug with Stroke in older builds
-    task.spawn(function()
-        local stroke = NoteBox:FindFirstChild("UIStroke")
-        if stroke then Tween(stroke, 0.4, {Transparency = 0}) end
-    end)
+    Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, TargetHeight), BackgroundTransparency = 0})
+    Tween(Title, 0.4, {TextTransparency = 0})
+    Tween(Content, 0.4, {TextTransparency = 0})
+    Tween(Icon, 0.4, {ImageTransparency = 0})
+    Tween(Stroke, 0.4, {Transparency = 0})
+    Tween(ProgressBack, 0.4, {BackgroundTransparency = 0})
+    Tween(ProgressBar, 0.4, {BackgroundTransparency = 0})
     
     -- Progress Animation
     Tween(ProgressBar, Props.Duration, {Size = UDim2.new(0, 0, 1, 0)})
     
     task.delay(Props.Duration, function()
-        Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, 0), Transparency = 1})
-        Tween(Title, 0.4, {Transparency = 1})
-        Tween(Content, 0.4, {Transparency = 1})
-        Tween(Icon, 0.4, {Transparency = 1})
+        Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1})
+        Tween(Title, 0.4, {TextTransparency = 1})
+        Tween(Content, 0.4, {TextTransparency = 1})
+        Tween(Icon, 0.4, {ImageTransparency = 1})
+        Tween(Stroke, 0.4, {Transparency = 1})
+        Tween(ProgressBack, 0.4, {BackgroundTransparency = 1})
+        Tween(ProgressBar, 0.4, {BackgroundTransparency = 1})
         task.wait(0.4)
         NoteBox:Destroy()
     end)
