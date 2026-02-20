@@ -6,7 +6,8 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.1"
+local Genim = {}
+Genim.Version = "v1.25.2"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -26,6 +27,15 @@ Genim.Themes = {
         SecondaryTextColor = Color3.fromRGB(148, 163, 184),
         StrokeColor = Color3.fromRGB(30, 41, 59),
         DarkerColor = Color3.fromRGB(2, 6, 15)
+    },
+    BloodMoon = {
+        MainColor = Color3.fromRGB(20, 5, 5),          -- Um vermelho quase preto para o fundo
+        AccentColor = Color3.fromRGB(190, 0, 0),        -- Vermelho sangue vibrante para destaques
+        SecondaryAccent = Color3.fromRGB(100, 0, 0),    -- Vermelho escuro/vinho para elementos secundários
+        TextColor = Color3.fromRGB(255, 230, 230),      -- Branco levemente rosado para legibilidade
+        SecondaryTextColor = Color3.fromRGB(150, 130, 130), -- Cinza avermelhado para textos menos importantes
+        StrokeColor = Color3.fromRGB(45, 15, 15),       -- Bordas em tom de ferrugem escura
+        DarkerColor = Color3.fromRGB(10, 2, 2)          -- O "vazio" absoluto para profundidade
     },
     Ocean = {
         MainColor = Color3.fromRGB(10, 25, 47),
@@ -145,171 +155,6 @@ local function MakeDraggable(TopBar, MainFrame)
 end
 
 -- Library Methods
--- Notifications Table
-Genim.Notifications = {}
-
-function Genim:Notify(Props)
-    Props = Props or {}
-    Props.Title = Props.Title or "Notification"
-    Props.Content = Props.Content or "This is a notification message."
-    Props.Duration = Props.Duration or 5
-    Props.Type = Props.Type or "Info" -- Success, Error, Warning, Info
-    
-    -- Type Configuration
-    local TypeData = {
-        Success = { Color = Color3.fromRGB(34, 197, 94), Image = "rbxassetid://15132379512" }, -- Checkmark
-        Error = { Color = Color3.fromRGB(239, 68, 68), Image = "rbxassetid://15132379512" }, -- Error
-        Warning = { Color = Color3.fromRGB(234, 179, 8), Image = "rbxassetid://15132379512" }, -- Alert
-        Info = { Color = Genim.Theme.AccentColor, Image = "rbxassetid://15132379512" } -- Info
-    }
-    
-    local Config = TypeData[Props.Type] or TypeData.Info
-    local AccentColor = Config.Color
-    local DefaultImage = Config.Image
-    
-    Props.Image = Props.Image or DefaultImage
-    
-    local NotificationGui = CoreGui:FindFirstChild("GenimNotifications")
-    if not NotificationGui then
-        NotificationGui = Create("ScreenGui", {
-            Name = "GenimNotifications",
-            Parent = (RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui")) or CoreGui
-        })
-        
-        local Holder = Create("Frame", {
-            Name = "Holder",
-            Parent = NotificationGui,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(1, -310, 1, -20),
-            Size = UDim2.new(0, 300, 1, -20)
-        })
-        
-        Create("UIListLayout", {
-            Parent = Holder,
-            Padding = UDim.new(0, 10),
-            VerticalAlignment = Enum.VerticalAlignment.Bottom,
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    end
-    
-    local Holder = NotificationGui.Holder
-    
-    local NoteBox = Create("Frame", {
-        Name = "Note",
-        Parent = Holder,
-        BackgroundColor3 = Genim.Theme.MainColor,
-        BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 0, 0), -- Animated
-        ClipsDescendants = true,
-        LayoutOrder = #Holder:GetChildren(),
-        BackgroundTransparency = 1
-    })
-    
-    Create("UICorner", {
-        CornerRadius = UDim.new(0, 8),
-        Parent = NoteBox
-    })
-    
-    local Stroke = Create("UIStroke", {
-        Color = Genim.Theme.StrokeColor,
-        Thickness = 1,
-        Parent = NoteBox,
-        Transparency = 1
-    })
-
-    local Title = Create("TextLabel", {
-        Parent = NoteBox,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 40, 0, 8),
-        Size = UDim2.new(1, -50, 0, 15),
-        Font = Enum.Font.GothamBold,
-        Text = Props.Title,
-        TextColor3 = Genim.Theme.TextColor,
-        TextSize = 13,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextTransparency = 1
-    })
-    
-    Create("UIGradient", {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, AccentColor),
-            ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
-        }),
-        Parent = Title
-    })
-
-    local Content = Create("TextLabel", {
-        Parent = NoteBox,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 40, 0, 25),
-        Size = UDim2.new(1, -50, 0, 0),
-        Font = Enum.Font.GothamMedium,
-        Text = Props.Content,
-        TextColor3 = Genim.Theme.SecondaryTextColor,
-        TextSize = 11,
-        TextWrapped = true,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Top,
-        TextTransparency = 1
-    })
-
-    local Icon = Create("ImageLabel", {
-        Parent = NoteBox,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 10, 0, 10),
-        Size = UDim2.new(0, 22, 0, 22),
-        Image = Props.Image,
-        ImageColor3 = AccentColor,
-        ImageTransparency = 1
-    })
-
-    -- Progress Bar
-    local ProgressBack = Create("Frame", {
-        Name = "ProgressBack",
-        Parent = NoteBox,
-        BackgroundColor3 = Color3.fromRGB(30, 41, 59),
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -2),
-        Size = UDim2.new(1, 0, 0, 2),
-        BackgroundTransparency = 1
-    })
-    
-    local ProgressBar = Create("Frame", {
-        Name = "ProgressBar",
-        Parent = ProgressBack,
-        BackgroundColor3 = AccentColor,
-        BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1
-    })
-
-    -- Animation Logic
-    Content.Size = UDim2.new(1, -50, 0, Content.TextBounds.Y)
-    local TargetHeight = math.max(60, Content.TextBounds.Y + 35)
-    
-    Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, TargetHeight), BackgroundTransparency = 0})
-    Tween(Title, 0.4, {TextTransparency = 0})
-    Tween(Content, 0.4, {TextTransparency = 0})
-    Tween(Icon, 0.4, {ImageTransparency = 0})
-    Tween(Stroke, 0.4, {Transparency = 0})
-    Tween(ProgressBack, 0.4, {BackgroundTransparency = 0})
-    Tween(ProgressBar, 0.4, {BackgroundTransparency = 0})
-    
-    -- Progress Animation
-    Tween(ProgressBar, Props.Duration, {Size = UDim2.new(0, 0, 1, 0)})
-    
-    task.delay(Props.Duration, function()
-        Tween(NoteBox, 0.4, {Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1})
-        Tween(Title, 0.4, {TextTransparency = 1})
-        Tween(Content, 0.4, {TextTransparency = 1})
-        Tween(Icon, 0.4, {ImageTransparency = 1})
-        Tween(Stroke, 0.4, {Transparency = 1})
-        Tween(ProgressBack, 0.4, {BackgroundTransparency = 1})
-        Tween(ProgressBar, 0.4, {BackgroundTransparency = 1})
-        task.wait(0.4)
-        NoteBox:Destroy()
-    end)
-end
 
 function Genim:CreateWindow(Config)
 
