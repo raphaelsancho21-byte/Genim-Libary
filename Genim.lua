@@ -6,6 +6,7 @@
 ]]
 
 local Genim = {}
+Genim.Version = "v1.2.5"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -318,12 +319,14 @@ function Genim:CreateWindow(Config)
         BorderSizePixel = 0,
         Position = UDim2.new(0, 5, 0, 10),
         Size = UDim2.new(1, -10, 1, -20),
-        ScrollBarThickness = 2,
+        ScrollBarThickness = 3,
         ScrollBarImageColor3 = Genim.Theme.AccentColor,
-        ScrollBarImageTransparency = 0.8,
+        ScrollBarImageTransparency = 0,
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
         CanvasSize = UDim2.new(0, 0, 0, 0),
-        ElasticBehavior = Enum.ElasticBehavior.Always
+        ElasticBehavior = Enum.ElasticBehavior.Always,
+        ScrollingDirection = Enum.ScrollingDirection.Y,
+        VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
     })
     
     local SideBarLayout = Create("UIListLayout", {
@@ -333,7 +336,7 @@ function Genim:CreateWindow(Config)
     })
 
     SideBarLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        SideBarList.CanvasSize = UDim2.new(0, 0, 0, SideBarLayout.AbsoluteContentSize.Y)
+        SideBarList.CanvasSize = UDim2.new(0, 0, 0, SideBarLayout.AbsoluteContentSize.Y + 10)
     end)
 
     -- Container
@@ -344,6 +347,20 @@ function Genim:CreateWindow(Config)
         Position = UDim2.new(0, 140, 0, 40),
         Size = UDim2.new(1, -140, 1, -40),
         ClipsDescendants = true
+    })
+
+    local VersionLabel = Create("TextLabel", {
+        Name = "Version",
+        Parent = MainFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 5, 1, -18),
+        Size = UDim2.new(0, 100, 0, 15),
+        Font = Enum.Font.GothamMedium,
+        Text = Genim.Version,
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 110
     })
     
     local Window = {
@@ -377,14 +394,15 @@ function Genim:CreateWindow(Config)
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
             Size = UDim2.new(1, 0, 1, 0),
-            ScrollBarThickness = 3,
+            ScrollBarThickness = 4,
             ScrollBarImageColor3 = Genim.Theme.AccentColor,
-            ScrollBarImageTransparency = 0.2,
+            ScrollBarImageTransparency = 0,
             Visible = false,
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ElasticBehavior = Enum.ElasticBehavior.Always,
-            ScrollingDirection = Enum.ScrollingDirection.Y
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
         })
         
         local TabList = Create("UIListLayout", {
@@ -394,9 +412,9 @@ function Genim:CreateWindow(Config)
             HorizontalAlignment = Enum.HorizontalAlignment.Center
         })
 
-        -- Fallback for some environments where AutomaticCanvasSize fails
+        -- Robust Manual Update with Extra Padding
         TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabContent.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 20)
+            TabContent.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 50)
         end)
         
         Create("UIPadding", {
