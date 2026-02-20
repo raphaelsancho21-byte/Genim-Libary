@@ -17,15 +17,55 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 
 -- Constants & Theme
-Genim.Theme = {
-    MainColor = Color3.fromRGB(5, 11, 24), -- Deep Blue
-    AccentColor = Color3.fromRGB(26, 115, 232), -- Gemini Blue
-    SecondaryAccent = Color3.fromRGB(147, 51, 234), -- Purple
-    TextColor = Color3.fromRGB(248, 250, 252),
-    SecondaryTextColor = Color3.fromRGB(148, 163, 184),
-    StrokeColor = Color3.fromRGB(30, 41, 59),
-    DarkerColor = Color3.fromRGB(2, 6, 15)
+Genim.Themes = {
+    Default = {
+        MainColor = Color3.fromRGB(5, 11, 24),
+        AccentColor = Color3.fromRGB(26, 115, 232),
+        SecondaryAccent = Color3.fromRGB(147, 51, 234),
+        TextColor = Color3.fromRGB(248, 250, 252),
+        SecondaryTextColor = Color3.fromRGB(148, 163, 184),
+        StrokeColor = Color3.fromRGB(30, 41, 59),
+        DarkerColor = Color3.fromRGB(2, 6, 15)
+    },
+    Ocean = {
+        MainColor = Color3.fromRGB(10, 25, 47),
+        AccentColor = Color3.fromRGB(0, 206, 209),
+        SecondaryAccent = Color3.fromRGB(0, 150, 255),
+        TextColor = Color3.fromRGB(230, 241, 255),
+        SecondaryTextColor = Color3.fromRGB(136, 146, 176),
+        StrokeColor = Color3.fromRGB(23, 42, 69),
+        DarkerColor = Color3.fromRGB(2, 12, 27)
+    },
+    Amethyst = {
+        MainColor = Color3.fromRGB(15, 10, 25),
+        AccentColor = Color3.fromRGB(168, 85, 247),
+        SecondaryAccent = Color3.fromRGB(236, 72, 153),
+        TextColor = Color3.fromRGB(250, 245, 255),
+        SecondaryTextColor = Color3.fromRGB(168, 162, 158),
+        StrokeColor = Color3.fromRGB(46, 16, 101),
+        DarkerColor = Color3.fromRGB(12, 6, 23)
+    },
+    Emerald = {
+        MainColor = Color3.fromRGB(6, 20, 15),
+        AccentColor = Color3.fromRGB(34, 197, 94),
+        SecondaryAccent = Color3.fromRGB(16, 185, 129),
+        TextColor = Color3.fromRGB(240, 253, 244),
+        SecondaryTextColor = Color3.fromRGB(100, 116, 139),
+        StrokeColor = Color3.fromRGB(20, 83, 45),
+        DarkerColor = Color3.fromRGB(2, 15, 10)
+    },
+    Light = {
+        MainColor = Color3.fromRGB(248, 250, 252),
+        AccentColor = Color3.fromRGB(37, 99, 235),
+        SecondaryAccent = Color3.fromRGB(79, 70, 229),
+        TextColor = Color3.fromRGB(15, 23, 42),
+        SecondaryTextColor = Color3.fromRGB(100, 116, 139),
+        StrokeColor = Color3.fromRGB(226, 232, 240),
+        DarkerColor = Color3.fromRGB(241, 245, 249)
+    }
 }
+
+Genim.Theme = Genim.Themes.Default
 
 -- Utility Functions
 local function Create(class, props)
@@ -221,6 +261,11 @@ function Genim:CreateWindow(Config)
 
     Config = Config or {}
     Config.Name = Config.Name or "Genim Library"
+    Config.Theme = Config.Theme or "Default"
+    
+    if Genim.Themes[Config.Theme] then
+        Genim.Theme = Genim.Themes[Config.Theme]
+    end
     
     local ScreenGui = Create("ScreenGui", {
         Name = "Genim_" .. HttpService:GenerateGUID(false):sub(1, 8),
