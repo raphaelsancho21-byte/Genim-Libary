@@ -105,27 +105,25 @@ end
 
 -- Key System Utilities
 local function IsFolder(path)
-    if isfolder then
-        return isfolder(path)
-    end
-    return false
+    return isfolder and isfolder(path) or false
+end
+
+local function IsFile(path)
+    return isfile and isfile(path) or false
 end
 
 local function MakeFolder(path)
-    if makefolder then
-        makefolder(path)
-    end
+    if makefolder then makefolder(path) end
 end
 
 local function WriteFile(path, content)
-    if writefile then
-        writefile(path, content)
-    end
+    if writefile then writefile(path, content) end
 end
 
 local function ReadFile(path)
-    if readfile then
-        return readfile(path)
+    if isfile and isfile(path) then
+        local success, content = pcall(function() return readfile(path) end)
+        if success then return content end
     end
     return nil
 end
@@ -134,9 +132,11 @@ local function EnsureFolder(path)
     local folders = string.split(path, "/")
     local current = ""
     for _, folder in ipairs(folders) do
-        current = current .. folder .. "/"
-        if not IsFolder(current) then
-            MakeFolder(current)
+        if folder ~= "" then
+            current = current .. folder .. "/"
+            if not IsFolder(current) then
+                MakeFolder(current)
+            end
         end
     end
 end
