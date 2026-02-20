@@ -1119,6 +1119,7 @@ function Genim:CreateWindow(Config)
     local Debounce = false
     
     function Window:Toggle(state)
+        if LoadingFrame and LoadingFrame.Parent then return end -- Don't toggle while loading
         if Debounce then return end
         Debounce = true
         
@@ -1130,9 +1131,9 @@ function Genim:CreateWindow(Config)
         
         if Toggled then
             MainFrame.Visible = true
-            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 500, 0, 350), Position = UDim2.new(0.5, 0, 0.5, 0)})
+            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 500, 0, 350)})
         else
-            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
+            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
             task.delay(0.4, function()
                 if not Toggled then MainFrame.Visible = false end
             end)
@@ -1404,22 +1405,16 @@ function Genim:CreateWindow(Config)
         -- Initial Check
         local saved = ReadFile("Genim/Keys/" .. KeySettings.FileName .. ".txt")
         if saved then
-            -- Silent verify or auto-fill
-            KeyInput.Text = saved
-            -- We automatically start hidden if it matches
             local target = ""
             if type(KeyInfo) == "string" then target = KeyInfo elseif type(KeyInfo) == "table" then for _,k in pairs(KeyInfo) do if saved == k then target = k break end end end
             
             if saved == target then
-                task.spawn(function()
-                    MainFrame.Visible = true
-                    Tween(MainFrame, 0.6, {
-                        Size = UDim2.new(0, 500, 0, 350),
-                        Position = UDim2.new(0.5, 0, 0.5, 0)
-                    })
-                    task.wait(0.6)
-                    StartLoading()
-                end)
+                Genim:Notify({
+                    Title = "Verificado",
+                    Content = "Chave carregada do arquivo local.",
+                    Duration = 3
+                })
+                StartLoading()
                 return Window
             end
         end
