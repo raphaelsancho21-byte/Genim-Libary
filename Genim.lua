@@ -318,8 +318,12 @@ function Genim:CreateWindow(Config)
         BorderSizePixel = 0,
         Position = UDim2.new(0, 5, 0, 10),
         Size = UDim2.new(1, -10, 1, -20),
-        ScrollBarThickness = 0,
-        CanvasSize = UDim2.new(0, 0, 0, 0)
+        ScrollBarThickness = 2,
+        ScrollBarImageColor3 = Genim.Theme.AccentColor,
+        ScrollBarImageTransparency = 0.8,
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        ElasticBehavior = Enum.ElasticBehavior.Always
     })
     
     Create("UIListLayout", {
@@ -371,8 +375,11 @@ function Genim:CreateWindow(Config)
             Size = UDim2.new(1, 0, 1, 0),
             ScrollBarThickness = 2,
             ScrollBarImageColor3 = Genim.Theme.AccentColor,
+            ScrollBarImageTransparency = 0.5,
             Visible = false,
-            CanvasSize = UDim2.new(0, 0, 0, 0)
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ElasticBehavior = Enum.ElasticBehavior.Always
         })
         
         Create("UIListLayout", {
