@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.3"
+Genim.Version = "v1.25.3 [UPD GUI]"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -160,6 +160,10 @@ function Genim:CreateWindow(Config)
     Config = Config or {}
     Config.Name = Config.Name or "Genim Library"
     Config.Theme = Config.Theme or "Default"
+    
+    local KeySystem = Config.KeySystem or false
+    local KeySettings = Config.KeySettings or {}
+    local ValidKey = KeySettings.Key or ""
     
     if Genim.Themes[Config.Theme] then
         Genim.Theme = Genim.Themes[Config.Theme]
@@ -1159,7 +1163,124 @@ function Genim:CreateWindow(Config)
         end)
     end
 
-    StartLoading()
+    if KeySystem then
+        local KeyFrame = Create("Frame", {
+            Name = "KeyFrame",
+            Parent = ScreenGui,
+            BackgroundColor3 = Genim.Theme.MainColor,
+            BorderSizePixel = 0,
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            Size = UDim2.new(0, 320, 0, 180),
+            ClipsDescendants = true
+        })
+        
+        Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = KeyFrame })
+        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1.2, Parent = KeyFrame })
+
+        local KTitle = Create("TextLabel", {
+            Parent = KeyFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0, 20),
+            Size = UDim2.new(1, 0, 0, 25),
+            Font = Enum.Font.GothamBold,
+            Text = KeySettings.Title or "Verification Required",
+            TextColor3 = Genim.Theme.TextColor,
+            TextSize = 18
+        })
+
+        local KSubtitle = Create("TextLabel", {
+            Parent = KeyFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0, 45),
+            Size = UDim2.new(1, 0, 0, 20),
+            Font = Enum.Font.GothamMedium,
+            Text = KeySettings.Subtitle or "Join Discord to get the Key",
+            TextColor3 = Genim.Theme.SecondaryTextColor,
+            TextSize = 12
+        })
+
+        local KInput = Create("TextBox", {
+            Parent = KeyFrame,
+            BackgroundColor3 = Genim.Theme.DarkerColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0.1, 0, 0.5, -15),
+            Size = UDim2.new(0.8, 0, 0, 35),
+            Font = Enum.Font.GothamMedium,
+            PlaceholderText = "Enter key here...",
+            Text = "",
+            TextColor3 = Genim.Theme.TextColor,
+            TextSize = 14
+        })
+        
+        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = KInput })
+        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KInput })
+
+        local VerifyBtn = Create("TextButton", {
+            Parent = KeyFrame,
+            BackgroundColor3 = Genim.Theme.AccentColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0.1, 0, 0.8, -10),
+            Size = UDim2.new(0.38, 0, 0, 30),
+            Font = Enum.Font.GothamBold,
+            Text = "Verify",
+            TextColor3 = Color3.new(1, 1, 1),
+            TextSize = 14,
+            AutoButtonColor = false
+        })
+        
+        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = VerifyBtn })
+
+        local GetKeyBtn = Create("TextButton", {
+            Parent = KeyFrame,
+            BackgroundColor3 = Genim.Theme.DarkerColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0.52, 0, 0.8, -10),
+            Size = UDim2.new(0.38, 0, 0, 30),
+            Font = Enum.Font.GothamBold,
+            Text = "Get Key",
+            TextColor3 = Genim.Theme.TextColor,
+            TextSize = 14,
+            AutoButtonColor = false
+        })
+        
+        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = GetKeyBtn })
+        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = GetKeyBtn })
+
+        MakeDraggable(KeyFrame, KeyFrame)
+
+        VerifyBtn.MouseButton1Click:Connect(function()
+            Ripple(VerifyBtn)
+            if KInput.Text == ValidKey then
+                Tween(KeyFrame, 0.5, {Size = UDim2.new(0, 0, 0, 0)})
+                task.wait(0.5)
+                KeyFrame:Destroy()
+                StartLoading()
+            else
+                KInput.Text = ""
+                KInput.PlaceholderText = "Invalid Key! Try again."
+                task.wait(1.5)
+                KInput.PlaceholderText = "Enter key here..."
+            end
+        end)
+
+        GetKeyBtn.MouseButton1Click:Connect(function()
+            Ripple(GetKeyBtn)
+            if setclipboard then
+                setclipboard(KeySettings.Link or "https://discord.gg/example")
+                GetKeyBtn.Text = "Copied!"
+                task.wait(1)
+                GetKeyBtn.Text = "Get Key"
+            else
+                print("Key Link: " .. (KeySettings.Link or "https://discord.gg/example"))
+                GetKeyBtn.Text = "Check Console"
+                task.wait(1)
+                GetKeyBtn.Text = "Get Key"
+            end
+        end)
+    else
+        StartLoading()
+    end
     
     return Window
 end
