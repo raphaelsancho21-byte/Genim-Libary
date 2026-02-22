@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.4 [UPD GUI]"
+Genim.Version = "v1.25.5 [UPD GUI]"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -167,7 +167,7 @@ function Genim:CreateWindow(Config)
     })
     
     -- Main Container
-    local MainFrame = Create("Frame", {
+    local MainFrame = Create("CanvasGroup", {
         Name = "MainFrame",
         Parent = ScreenGui,
         BackgroundColor3 = Genim.Theme.MainColor,
