@@ -6,8 +6,10 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.8"
+Genim.Version = "v1.25.9"
 Genim.NotifyHolder = nil
+Genim.Flags = {}
+Genim.ConfigSettings = {Folder = nil, File = nil}
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -132,6 +134,24 @@ function Genim:CreateWindow(Config)
     
     if Genim.Themes[Config.Theme] then
         Genim.Theme = Genim.Themes[Config.Theme]
+    end
+    
+    -- Config System Initialization
+    if Config.Configuration and Config.Configuration.FolderName and Config.Configuration.ConfigName then
+        Genim.ConfigSettings.Folder = Config.Configuration.FolderName
+        Genim.ConfigSettings.File = Config.Configuration.ConfigName
+        
+        -- Load existing config
+        local path = Genim.ConfigSettings.Folder .. "/" .. Genim.ConfigSettings.File .. ".json"
+        if isfile and isfile(path) then
+            local success, content = pcall(readfile, path)
+            if success then
+                local success2, data = pcall(function() return HttpService:JSONDecode(content) end)
+                if success2 then
+                    Genim.Flags = data
+                end
+            end
+        end
     end
     
     local ScreenGui = Create("ScreenGui", {
@@ -489,9 +509,14 @@ function Genim:CreateWindow(Config)
             Props = Props or {}
             Props.Name = Props.Name or "Toggle"
             Props.CurrentValue = Props.CurrentValue or false
+            Props.Flag = Props.Flag or nil
             Props.Callback = Props.Callback or function() end
             
             local Toggled = Props.CurrentValue
+
+            if Props.Flag and Genim.Flags[Props.Flag] ~= nil then
+                Toggled = Genim.Flags[Props.Flag]
+            end
 
             local ToggleFrame = Create("Frame", {
                 Name = Props.Name .. "Toggle",
@@ -557,7 +582,7 @@ function Genim:CreateWindow(Config)
                 Text = ""
             })
 
-            local function Update()
+            local function Update(Save)
                 if Toggled then
                     Tween(OuterToggle, 0.2, {BackgroundColor3 = Genim.Theme.AccentColor})
                     Tween(InnerToggle, 0.2, {Position = UDim2.new(1, -16, 0.5, -7)})
@@ -565,22 +590,28 @@ function Genim:CreateWindow(Config)
                     Tween(OuterToggle, 0.2, {BackgroundColor3 = Color3.fromRGB(30, 41, 59)})
                     Tween(InnerToggle, 0.2, {Position = UDim2.new(0, 2, 0.5, -7)})
                 end
+                
+                if Props.Flag then
+                    Genim.Flags[Props.Flag] = Toggled
+                    if Save then Genim:SaveConfiguration() end
+                end
+                
                 Props.Callback(Toggled)
             end
 
             Button.MouseButton1Click:Connect(function()
                 Ripple(ToggleFrame)
                 Toggled = not Toggled
-                Update()
+                Update(true)
             end)
 
 
-            if Toggled then Update() end
+            if Toggled then Update(false) end
 
             return {
                 Set = function(_, NewValue)
                     Toggled = NewValue
-                    Update()
+                    Update(true)
                 end
             }
         end
@@ -591,9 +622,14 @@ function Genim:CreateWindow(Config)
             Props.Min = Props.Min or 0
             Props.Max = Props.Max or 100
             Props.CurrentValue = Props.CurrentValue or 50
+            Props.Flag = Props.Flag or nil
             Props.Callback = Props.Callback or function() end
             
             local Value = Props.CurrentValue
+
+            if Props.Flag and Genim.Flags[Props.Flag] ~= nil then
+                Value = Genim.Flags[Props.Flag]
+            end
 
             local SliderFrame = Create("Frame", {
                 Name = Props.Name .. "Slider",
@@ -682,12 +718,24 @@ function Genim:CreateWindow(Config)
                 Parent = SliderDot
             })
 
-            local function Update(Input)
-                local Percentage = math.clamp((Input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X, 0, 1)
+            local function Update(Input, Save)
+                local Percentage
+                if typeof(Input) == "number" then
+                    Percentage = Input
+                else
+                    Percentage = math.clamp((Input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X, 0, 1)
+                end
+                
                 Value = math.floor(Props.Min + (Props.Max - Props.Min) * Percentage)
                 
                 ValueLabel.Text = tostring(Value)
                 Tween(SliderFill, 0.1, {Size = UDim2.new(Percentage, 0, 1, 0)})
+                
+                if Props.Flag then
+                    Genim.Flags[Props.Flag] = Value
+                    if Save then Genim:SaveConfiguration() end
+                end
+                
                 Props.Callback(Value)
             end
 
@@ -695,7 +743,7 @@ function Genim:CreateWindow(Config)
             SliderFrame.InputBegan:Connect(function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                     Dragging = true
-                    Update(Input)
+                    Update(Input, true)
                 end
             end)
 
@@ -707,17 +755,21 @@ function Genim:CreateWindow(Config)
 
             UserInputService.InputChanged:Connect(function(Input)
                 if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
-                    Update(Input)
+                    Update(Input, true)
                 end
             end)
+
+            if Value ~= Props.CurrentValue then
+                task.spawn(function()
+                    task.wait()
+                    Update((Value - Props.Min) / (Props.Max - Props.Min), false)
+                end)
+            end
 
             return {
                 Set = function(_, NewValue)
                     Value = math.clamp(NewValue, Props.Min, Props.Max)
-                    ValueLabel.Text = tostring(Value)
-                    local Percentage = (Value - Props.Min) / (Props.Max - Props.Min)
-                    Tween(SliderFill, 0.2, {Size = UDim2.new(Percentage, 0, 1, 0)})
-                    Props.Callback(Value)
+                    Update((Value - Props.Min) / (Props.Max - Props.Min), true)
                 end
             }
         end
@@ -801,10 +853,15 @@ function Genim:CreateWindow(Config)
             Props.Name = Props.Name or "Dropdown"
             Props.Options = Props.Options or {"Option 1", "Option 2"}
             Props.CurrentOption = Props.CurrentOption or Props.Options[1]
+            Props.Flag = Props.Flag or nil
             Props.Callback = Props.Callback or function() end
             
             local Selected = Props.CurrentOption
             local Opened = false
+
+            if Props.Flag and Genim.Flags[Props.Flag] ~= nil then
+                Selected = Genim.Flags[Props.Flag]
+            end
 
             local DropdownFrame = Create("Frame", {
                 Name = Props.Name .. "Dropdown",
@@ -855,7 +912,7 @@ function Genim:CreateWindow(Config)
                 BackgroundTransparency = 1,
                 Position = UDim2.new(1, -30, 0, 10),
                 Size = UDim2.new(0, 18, 0, 18),
-                Image = "rbxassetid://15132379512", -- Same icon for now
+                Image = "rbxassetid://15132379512",
                 Rotation = 90,
                 ImageColor3 = Genim.Theme.SecondaryTextColor
             })
@@ -883,7 +940,6 @@ function Genim:CreateWindow(Config)
 
             local function Toggle(State)
                 Opened = State
-                local TargetSize = Opened and UDim2.new(0, 18, 0, 18) or UDim2.new(0, 18, 0, 18) -- Rotation handle
                 Tween(Arrow, 0.2, {Rotation = Opened and 270 or 90})
                 
                 local ContentSize = 38
@@ -895,6 +951,24 @@ function Genim:CreateWindow(Config)
                 end
                 
                 Tween(DropdownFrame, 0.3, {Size = UDim2.new(0.9, 0, 0, ContentSize)})
+            end
+
+            local function Update(Value, Save)
+                Selected = Value
+                SelectedLabel.Text = Selected
+                
+                for _, child in pairs(ItemsContainer:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        child.TextColor3 = (child.Name == Selected and Genim.Theme.TextColor or Genim.Theme.SecondaryTextColor)
+                    end
+                end
+                
+                if Props.Flag then
+                    Genim.Flags[Props.Flag] = Selected
+                    if Save then Genim:SaveConfiguration() end
+                end
+                
+                Props.Callback(Selected)
             end
 
             local function AddOption(Value)
@@ -917,15 +991,8 @@ function Genim:CreateWindow(Config)
                 })
                 
                 btn.MouseButton1Click:Connect(function()
-                    Selected = Value
-                    SelectedLabel.Text = Selected
-                    for _, child in pairs(ItemsContainer:GetChildren()) do
-                        if child:IsA("TextButton") then
-                            child.TextColor3 = (child.Name == Selected and Genim.Theme.TextColor or Genim.Theme.SecondaryTextColor)
-                        end
-                    end
+                    Update(Value, true)
                     Toggle(false)
-                    Props.Callback(Selected)
                 end)
             end
 
@@ -944,11 +1011,16 @@ function Genim:CreateWindow(Config)
                 Toggle(not Opened)
             end)
 
+            if Selected ~= Props.CurrentOption then
+                task.spawn(function()
+                    task.wait()
+                    Update(Selected, false)
+                end)
+            end
+
             return {
                 Set = function(_, NewValue)
-                    Selected = NewValue
-                    SelectedLabel.Text = Selected
-                    Props.Callback(Selected)
+                    Update(NewValue, true)
                 end,
                 Refresh = function(_, NewOptions, ClearOld)
                     if ClearOld then
@@ -1317,6 +1389,28 @@ function Genim:CreateWindow(Config)
 end
 
 
+
+function Genim:SaveConfiguration()
+    if not Genim.ConfigSettings or not Genim.ConfigSettings.Folder or not Genim.ConfigSettings.File then return end
+    
+    local folder = Genim.ConfigSettings.Folder
+    local file = Genim.ConfigSettings.File
+    
+    if isfolder and makefile and not isfolder(folder) then 
+        makefolder(folder) 
+    end
+    
+    local data = HttpService:JSONEncode(Genim.Flags)
+    local success, err = pcall(function()
+        if writefile then
+            writefile(folder .. "/" .. file .. ".json", data)
+        end
+    end)
+    
+    if not success then
+        warn("Genim: Erro ao salvar configuração: " .. tostring(err))
+    end
+end
 
 function Genim:Notify(Config)
     Config = Config or {}
