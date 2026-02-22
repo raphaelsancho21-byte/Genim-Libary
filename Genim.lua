@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.9"
+Genim.Version = "v1.26.0"
 Genim.NotifyHolder = nil
 Genim.Flags = {}
 Genim.ConfigSettings = {Folder = nil, File = nil}
@@ -242,6 +242,17 @@ function Genim:CreateWindow(Config)
         Text = "X",
         TextColor3 = Genim.Theme.SecondaryTextColor,
         TextSize = 14,
+        AutoButtonColor = false
+    })
+
+    local SettingsButton = Create("ImageButton", {
+        Name = "SettingsButton",
+        Parent = TopBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(1, -70, 0.5, -9),
+        Size = UDim2.new(0, 18, 0, 18),
+        Image = "rbxassetid://15132379512",
+        ImageColor3 = Genim.Theme.SecondaryTextColor,
         AutoButtonColor = false
     })
 
@@ -1034,6 +1045,84 @@ function Genim:CreateWindow(Config)
                     end
                 end
             }
+        function Tab:CreateKeybind(Props)
+            Props = Props or {}
+            Props.Name = Props.Name or "Keybind"
+            Props.CurrentKey = Props.CurrentKey or Enum.KeyCode.K
+            Props.Flag = Props.Flag or nil
+            Props.Callback = Props.Callback or function() end
+
+            local Key = Props.CurrentKey
+            local Binding = false
+
+            if Props.Flag and Genim.Flags[Props.Flag] then
+                local success, keycode = pcall(function() return Enum.KeyCode[Genim.Flags[Props.Flag]] end)
+                if success then Key = keycode end
+            end
+
+            local KeybindFrame = Create("Frame", {
+                Name = Props.Name .. "Keybind",
+                Parent = TabContent,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Size = UDim2.new(0.9, 0, 0, 38)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = KeybindFrame })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KeybindFrame })
+
+            local Label = Create("TextLabel", {
+                Parent = KeybindFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 12, 0, 0),
+                Size = UDim2.new(1, -100, 1, 0),
+                Font = Enum.Font.GothamMedium,
+                Text = Props.Name,
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local KeyButton = Create("TextButton", {
+                Parent = KeybindFrame,
+                BackgroundColor3 = Color3.fromRGB(30, 41, 59),
+                Position = UDim2.new(1, -90, 0.5, -11),
+                Size = UDim2.new(0, 80, 0, 22),
+                Font = Enum.Font.GothamBold,
+                Text = Key.Name,
+                TextColor3 = Genim.Theme.AccentColor,
+                TextSize = 12,
+                AutoButtonColor = false
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = KeyButton })
+
+            KeyButton.MouseButton1Click:Connect(function()
+                Binding = true
+                KeyButton.Text = "..."
+                local inputConn
+                inputConn = UserInputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.Keyboard then
+                        Key = input.KeyCode
+                        KeyButton.Text = Key.Name
+                        Binding = false
+                        inputConn:Disconnect()
+                        
+                        if Props.Flag then
+                            Genim.Flags[Props.Flag] = Key.Name
+                            Genim:SaveConfiguration()
+                        end
+                        
+                        Props.Callback(Key)
+                    end
+                end)
+            end)
+
+            return {
+                Set = function(_, NewKey)
+                    Key = NewKey
+                    KeyButton.Text = Key.Name
+                    Props.Callback(Key)
+                end
+            }
         end
 
         function Tab:Select()
@@ -1281,17 +1370,6 @@ function Genim:CreateWindow(Config)
             ScreenGui:Destroy()
         end)
 
-        local KTitle = Create("TextLabel", {
-            Parent = KeyFrame,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 0, 0, 20),
-            Size = UDim2.new(1, 0, 0, 25),
-            Font = Enum.Font.GothamBold,
-            Text = KeySettings.Title or "Verification Required",
-            TextColor3 = Genim.Theme.TextColor,
-            TextSize = 18
-        })
-
         local KSubtitle = Create("TextLabel", {
             Parent = KeyFrame,
             BackgroundTransparency = 1,
@@ -1381,9 +1459,49 @@ function Genim:CreateWindow(Config)
                 GetKeyBtn.Text = "Get Key"
             end
         end)
-    else
+    -- End of Init
+    if not KeySystem then
         StartLoading()
     end
+
+    -- Settings Tab Creation
+    local SettingsTab = Window:CreateTab("Ajustes", 15132379512)
+    SettingsTab:CreateSection("Configurações da GUI")
+    
+    SettingsTab:CreateDropdown({
+        Name = "Tema da Interface",
+        Options = {"Dark", "Light"},
+        CurrentOption = Config.Theme,
+        Flag = "Genim_Theme",
+        Callback = function(Value)
+            if Value ~= Genim.ThemeName then
+                Genim:Notify({
+                    Title = "Tema Alterado",
+                    Content = "O tema será aplicado na próxima vez que o script for executado.",
+                    Duration = 5
+                })
+            end
+        end
+    })
+
+    SettingsTab:CreateKeybind({
+        Name = "Tecla da Interface",
+        CurrentKey = Config.Keybind or Enum.KeyCode.K,
+        Flag = "Genim_Keybind",
+        Callback = function(NewKey)
+            Config.Keybind = NewKey
+            Genim:Notify({
+                Title = "Keybind Atualizada",
+                Content = "Nova tecla: " .. NewKey.Name,
+                Duration = 3
+            })
+        end
+    })
+
+    SettingsButton.MouseButton1Click:Connect(function()
+        Ripple(SettingsButton)
+        SettingsTab:Select()
+    end)
     
     return Window
 end
