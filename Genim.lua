@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.5 [UPD GUI]"
+Genim.Version = "v1.25.4 [UPD GUI]"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
