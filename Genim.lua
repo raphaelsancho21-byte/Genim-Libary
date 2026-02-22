@@ -1370,6 +1370,17 @@ function Genim:CreateWindow(Config)
             ScreenGui:Destroy()
         end)
 
+        local KTitle = Create("TextLabel", {
+            Parent = KeyFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0, 20),
+            Size = UDim2.new(1, 0, 0, 25),
+            Font = Enum.Font.GothamBold,
+            Text = KeySettings.Title or "Verification Required",
+            TextColor3 = Genim.Theme.TextColor,
+            TextSize = 18
+        })
+
         local KSubtitle = Create("TextLabel", {
             Parent = KeyFrame,
             BackgroundTransparency = 1,
@@ -1459,8 +1470,7 @@ function Genim:CreateWindow(Config)
                 GetKeyBtn.Text = "Get Key"
             end
         end)
-    -- End of Init
-    if not KeySystem then
+    else
         StartLoading()
     end
 
@@ -1474,7 +1484,7 @@ function Genim:CreateWindow(Config)
         CurrentOption = Config.Theme,
         Flag = "Genim_Theme",
         Callback = function(Value)
-            if Value ~= Genim.ThemeName then
+            if Value ~= Config.Theme then
                 Genim:Notify({
                     Title = "Tema Alterado",
                     Content = "O tema será aplicado na próxima vez que o script for executado.",
