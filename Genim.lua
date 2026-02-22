@@ -19,7 +19,6 @@ local CoreGui = game:GetService("CoreGui")
 -- Constants & Theme
 Genim.Themes = {
 	Glass = {
-		Default = {
     MainColor = Color3.fromRGB(255, 255, 255), -- Branco com transparência
     AccentColor = Color3.fromRGB(156, 163, 175), -- Cinza suave
     SecondaryAccent = Color3.fromRGB(209, 213, 219), -- Cinza mais claro
