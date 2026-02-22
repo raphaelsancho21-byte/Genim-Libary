@@ -11,7 +11,7 @@ local Window = Genim:CreateWindow({
     KeySettings = {
         Title = "Sistema de Verificação",
         Subtitle = "Pegue a key no nosso Discord",
-        Link = "https://120347.oneapp.dev/",
+        Link = "genimsetup.netlify.app",
         Key = "GENIM-2026" -- A chave secreta
     }
 })
