@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.5 [UPD GUI]"
+Genim.Version = "v1.25.4 [UPD GUI]"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -211,6 +211,11 @@ function Genim:CreateWindow(Config)
         BackgroundTransparency = Genim.Theme.Transparency or 0,
         BorderSizePixel = 0,
         Size = UDim2.new(1, 0, 0, 40)
+
+        create("UICorner", {
+            CornerRadius = UDim.new(0, 10),
+            Parent = TopBar
+        })
     })
 
     local Title = Create("TextLabel", {
