@@ -62,16 +62,6 @@ Genim.Themes = {
         SecondaryTextColor = Color3.fromRGB(125, 150, 170),
         StrokeColor = Color3.fromRGB(15, 35, 55),
         DarkerColor = Color3.fromRGB(2, 8, 15)
-    },
-    Glass = {
-        MainColor = Color3.fromRGB(10, 12, 20),
-        AccentColor = Color3.fromRGB(255, 255, 255),
-        SecondaryAccent = Color3.fromRGB(180, 180, 180),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(200, 200, 200),
-        StrokeColor = Color3.fromRGB(255, 255, 255),
-        DarkerColor = Color3.fromRGB(5, 5, 8),
-        Transparency = 0.4
     }
 }
 
@@ -177,11 +167,10 @@ function Genim:CreateWindow(Config)
     })
     
     -- Main Container
-    local MainFrame = Create("CanvasGroup", {
+    local MainFrame = Create("Frame", {
         Name = "MainFrame",
         Parent = ScreenGui,
         BackgroundColor3 = Genim.Theme.MainColor,
-        BackgroundTransparency = Genim.Theme.Transparency or 0,
         BorderSizePixel = 0,
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -198,7 +187,6 @@ function Genim:CreateWindow(Config)
     
     Create("UIStroke", {
         Color = Genim.Theme.StrokeColor,
-        Transparency = Genim.Theme.Transparency and 0.5 or 0,
         Thickness = 1.2,
         Parent = MainFrame
     })
@@ -208,14 +196,14 @@ function Genim:CreateWindow(Config)
         Name = "TopBar",
         Parent = MainFrame,
         BackgroundColor3 = Genim.Theme.DarkerColor,
-        BackgroundTransparency = Genim.Theme.Transparency or 0,
         BorderSizePixel = 0,
         Size = UDim2.new(1, 0, 0, 40)
+        
+    })
 
-        create("UICorner", {
-            CornerRadius = UDim.new(0, 10),
-            Parent = TopBar
-        })
+    Create("UICorner", {
+        CornerRadius = UDim.new(0, 10),
+        Parent = TopBar
     })
 
     local Title = Create("TextLabel", {
@@ -275,10 +263,14 @@ function Genim:CreateWindow(Config)
         Name = "SideBar",
         Parent = MainFrame,
         BackgroundColor3 = Genim.Theme.DarkerColor,
-        BackgroundTransparency = (Genim.Theme.Transparency and Genim.Theme.Transparency + 0.1) or 0,
         BorderSizePixel = 0,
         Position = UDim2.new(0, 0, 0, 40),
         Size = UDim2.new(0, 140, 1, -40)
+    })
+
+    Create("UICorner", {
+        CornerRadius = UDim.new(0, 10),
+        Parent = SideBar
     })
     
     local SideBarList = Create("ScrollingFrame", {
@@ -1178,7 +1170,6 @@ function Genim:CreateWindow(Config)
             Name = "KeyFrame",
             Parent = ScreenGui,
             BackgroundColor3 = Genim.Theme.MainColor,
-            BackgroundTransparency = Genim.Theme.Transparency or 0,
             BorderSizePixel = 0,
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = UDim2.new(0.5, 0, 0.5, 0),
