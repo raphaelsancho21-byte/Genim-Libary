@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.3 [UPD GUI]"
+Genim.Version = "v1.25.4 [UPD GUI]"
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -19,58 +19,49 @@ local CoreGui = game:GetService("CoreGui")
 -- Constants & Theme
 Genim.Themes = {
     Default = {
-        MainColor = Color3.fromRGB(5, 11, 24),
+        MainColor = Color3.fromRGB(15, 17, 26),
         AccentColor = Color3.fromRGB(26, 115, 232),
         SecondaryAccent = Color3.fromRGB(147, 51, 234),
         TextColor = Color3.fromRGB(248, 250, 252),
         SecondaryTextColor = Color3.fromRGB(148, 163, 184),
         StrokeColor = Color3.fromRGB(30, 41, 59),
-        DarkerColor = Color3.fromRGB(2, 6, 15)
+        DarkerColor = Color3.fromRGB(10, 12, 20)
     },
-    BloodMoon = {
-        MainColor = Color3.fromRGB(20, 5, 5),          -- Um vermelho quase preto para o fundo
-        AccentColor = Color3.fromRGB(190, 0, 0),        -- Vermelho sangue vibrante para destaques
-        SecondaryAccent = Color3.fromRGB(100, 0, 0),    -- Vermelho escuro/vinho para elementos secundários
-        TextColor = Color3.fromRGB(255, 230, 230),      -- Branco levemente rosado para legibilidade
-        SecondaryTextColor = Color3.fromRGB(150, 130, 130), -- Cinza avermelhado para textos menos importantes
-        StrokeColor = Color3.fromRGB(45, 15, 15),       -- Bordas em tom de ferrugem escura
-        DarkerColor = Color3.fromRGB(10, 2, 2)          -- O "vazio" absoluto para profundidade
+    Carbon = {
+        MainColor = Color3.fromRGB(20, 20, 20),
+        AccentColor = Color3.fromRGB(200, 200, 200),
+        SecondaryAccent = Color3.fromRGB(150, 150, 150),
+        TextColor = Color3.fromRGB(255, 255, 255),
+        SecondaryTextColor = Color3.fromRGB(160, 160, 160),
+        StrokeColor = Color3.fromRGB(40, 40, 40),
+        DarkerColor = Color3.fromRGB(15, 15, 15)
+    },
+    Midnight = {
+        MainColor = Color3.fromRGB(0, 0, 0),
+        AccentColor = Color3.fromRGB(255, 255, 255),
+        SecondaryAccent = Color3.fromRGB(200, 200, 200),
+        TextColor = Color3.fromRGB(255, 255, 255),
+        SecondaryTextColor = Color3.fromRGB(150, 150, 150),
+        StrokeColor = Color3.fromRGB(30, 30, 30),
+        DarkerColor = Color3.fromRGB(5, 5, 5)
+    },
+    Crimson = {
+        MainColor = Color3.fromRGB(15, 5, 5),
+        AccentColor = Color3.fromRGB(220, 38, 38),
+        SecondaryAccent = Color3.fromRGB(153, 27, 27),
+        TextColor = Color3.fromRGB(250, 240, 240),
+        SecondaryTextColor = Color3.fromRGB(150, 120, 120),
+        StrokeColor = Color3.fromRGB(45, 15, 15),
+        DarkerColor = Color3.fromRGB(10, 2, 2)
     },
     Ocean = {
-        MainColor = Color3.fromRGB(10, 25, 47),
-        AccentColor = Color3.fromRGB(0, 206, 209),
-        SecondaryAccent = Color3.fromRGB(0, 150, 255),
-        TextColor = Color3.fromRGB(230, 241, 255),
-        SecondaryTextColor = Color3.fromRGB(136, 146, 176),
-        StrokeColor = Color3.fromRGB(23, 42, 69),
-        DarkerColor = Color3.fromRGB(2, 12, 27)
-    },
-    Amethyst = {
-        MainColor = Color3.fromRGB(15, 10, 25),
-        AccentColor = Color3.fromRGB(168, 85, 247),
-        SecondaryAccent = Color3.fromRGB(236, 72, 153),
-        TextColor = Color3.fromRGB(250, 245, 255),
-        SecondaryTextColor = Color3.fromRGB(168, 162, 158),
-        StrokeColor = Color3.fromRGB(46, 16, 101),
-        DarkerColor = Color3.fromRGB(12, 6, 23)
-    },
-    Emerald = {
-        MainColor = Color3.fromRGB(6, 20, 15),
-        AccentColor = Color3.fromRGB(34, 197, 94),
-        SecondaryAccent = Color3.fromRGB(16, 185, 129),
-        TextColor = Color3.fromRGB(240, 253, 244),
-        SecondaryTextColor = Color3.fromRGB(100, 116, 139),
-        StrokeColor = Color3.fromRGB(20, 83, 45),
-        DarkerColor = Color3.fromRGB(2, 15, 10)
-    },
-    Light = {
-        MainColor = Color3.fromRGB(248, 250, 252),
-        AccentColor = Color3.fromRGB(37, 99, 235),
-        SecondaryAccent = Color3.fromRGB(79, 70, 229),
-        TextColor = Color3.fromRGB(15, 23, 42),
-        SecondaryTextColor = Color3.fromRGB(100, 116, 139),
-        StrokeColor = Color3.fromRGB(226, 232, 240),
-        DarkerColor = Color3.fromRGB(241, 245, 249)
+        MainColor = Color3.fromRGB(5, 15, 25),
+        AccentColor = Color3.fromRGB(14, 165, 233),
+        SecondaryAccent = Color3.fromRGB(7, 89, 133),
+        TextColor = Color3.fromRGB(240, 249, 255),
+        SecondaryTextColor = Color3.fromRGB(125, 150, 170),
+        StrokeColor = Color3.fromRGB(15, 35, 55),
+        DarkerColor = Color3.fromRGB(2, 8, 15)
     }
 }
 
@@ -1177,6 +1168,34 @@ function Genim:CreateWindow(Config)
         
         Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = KeyFrame })
         Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1.2, Parent = KeyFrame })
+
+        local KClose = Create("TextButton", {
+            Name = "CloseButton",
+            Parent = KeyFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(1, -30, 0, 5),
+            Size = UDim2.new(0, 25, 0, 25),
+            Font = Enum.Font.GothamBold,
+            Text = "X",
+            TextColor3 = Genim.Theme.SecondaryTextColor,
+            TextSize = 14,
+            AutoButtonColor = false
+        })
+
+        KClose.MouseEnter:Connect(function()
+            Tween(KClose, 0.2, {TextColor3 = Color3.fromRGB(255, 100, 100)})
+        end)
+
+        KClose.MouseLeave:Connect(function()
+            Tween(KClose, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor})
+        end)
+
+        KClose.MouseButton1Click:Connect(function()
+            Ripple(KClose)
+            Tween(KeyFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
+            task.wait(0.4)
+            ScreenGui:Destroy()
+        end)
 
         local KTitle = Create("TextLabel", {
             Parent = KeyFrame,
