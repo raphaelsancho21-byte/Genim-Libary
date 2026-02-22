@@ -6,7 +6,8 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.4 [UPD GUI]"
+Genim.Version = "v1.25.6"
+Genim.NotifyHolder = nil
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -165,6 +166,25 @@ function Genim:CreateWindow(Config)
         Parent = (RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui")) or CoreGui,
         ResetOnSpawn = false
     })
+    
+    -- Notification Container
+    local NotifyHolder = Create("Frame", {
+        Name = "NotifyHolder",
+        Parent = ScreenGui,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(1, -310, 1, -20),
+        Size = UDim2.new(0, 300, 1, -20),
+        AnchorPoint = Vector2.new(0, 1)
+    })
+    
+    Create("UIListLayout", {
+        Parent = NotifyHolder,
+        Padding = UDim.new(0, 10),
+        VerticalAlignment = Enum.VerticalAlignment.Bottom,
+        SortOrder = Enum.SortOrder.LayoutOrder
+    })
+    
+    Genim.NotifyHolder = NotifyHolder
     
     -- Main Container
     local MainFrame = Create("Frame", {
@@ -1316,5 +1336,75 @@ function Genim:CreateWindow(Config)
 end
 
 
+
+function Genim:Notify(Config)
+    Config = Config or {}
+    Config.Title = Config.Title or "Notification"
+    Config.Content = Config.Content or "Content"
+    Config.Duration = Config.Duration or 5
+    
+    if not Genim.NotifyHolder then return end
+    
+    local NotifyFrame = Create("Frame", {
+        Name = "Notification",
+        Parent = Genim.NotifyHolder,
+        BackgroundColor3 = Genim.Theme.MainColor,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 0, 0),
+        ClipsDescendants = true,
+        Transparency = 1
+    })
+    
+    Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = NotifyFrame })
+    local Stroke = Create("UIStroke", { Color = Genim.Theme.AccentColor, Thickness = 1.2, Transparency = 1, Parent = NotifyFrame })
+    
+    local Title = Create("TextLabel", {
+        Parent = NotifyFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 12, 0, 8),
+        Size = UDim2.new(1, -24, 0, 20),
+        Font = Enum.Font.GothamBold,
+        Text = Config.Title,
+        TextColor3 = Genim.Theme.TextColor,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTransparency = 1
+    })
+    
+    local Content = Create("TextLabel", {
+        Parent = NotifyFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 12, 0, 28),
+        Size = UDim2.new(1, -24, 0, 0),
+        Font = Enum.Font.GothamMedium,
+        Text = Config.Content,
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextWrapped = true,
+        TextTransparency = 1
+    })
+
+    -- Auto-Size based on content
+    local textHeight = game:GetService("TextService"):GetTextSize(Config.Content, 12, Enum.Font.GothamMedium, Vector2.new(276, 1000)).Y
+    local totalHeight = 40 + textHeight
+    
+    -- Animation In
+    Tween(NotifyFrame, 0.4, {Size = UDim2.new(1, 0, 0, totalHeight), BackgroundTransparency = 0})
+    Tween(Stroke, 0.4, {Transparency = 0})
+    Tween(Title, 0.4, {TextTransparency = 0})
+    Tween(Content, 0.4, {TextTransparency = 0, Size = UDim2.new(1, -24, 0, textHeight)})
+    
+    task.delay(Config.Duration, function()
+        -- Animation Out
+        Tween(NotifyFrame, 0.4, {Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1})
+        Tween(Stroke, 0.4, {Transparency = 1})
+        Tween(Title, 0.4, {TextTransparency = 1})
+        Tween(Content, 0.4, {TextTransparency = 1})
+        task.wait(0.4)
+        NotifyFrame:Destroy()
+    end)
+end
 
 return Genim
