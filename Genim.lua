@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.26.0"
+Genim.Version = "v1.26.1"
 Genim.NotifyHolder = nil
 Genim.Flags = {}
 Genim.ConfigSettings = {Folder = nil, File = nil}
@@ -245,16 +245,6 @@ function Genim:CreateWindow(Config)
         AutoButtonColor = false
     })
 
-    local SettingsButton = Create("ImageButton", {
-        Name = "SettingsButton",
-        Parent = TopBar,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(1, -70, 0.5, -9),
-        Size = UDim2.new(0, 18, 0, 18),
-        Image = "rbxassetid://15132379512",
-        ImageColor3 = Genim.Theme.SecondaryTextColor,
-        AutoButtonColor = false
-    })
 
     CloseButton.MouseEnter:Connect(function()
         Tween(CloseButton, 0.2, {TextColor3 = Color3.fromRGB(255, 100, 100)})
@@ -1474,45 +1464,6 @@ function Genim:CreateWindow(Config)
         StartLoading()
     end
 
-    -- Settings Tab Creation
-    local SettingsTab = Window:CreateTab("Ajustes", 15132379512)
-    SettingsTab:CreateSection("Configurações da GUI")
-    
-    SettingsTab:CreateDropdown({
-        Name = "Tema da Interface",
-        Options = {"Dark", "Light"},
-        CurrentOption = Config.Theme,
-        Flag = "Genim_Theme",
-        Callback = function(Value)
-            if Value ~= Config.Theme then
-                Genim:Notify({
-                    Title = "Tema Alterado",
-                    Content = "O tema será aplicado na próxima vez que o script for executado.",
-                    Duration = 5
-                })
-            end
-        end
-    })
-
-    SettingsTab:CreateKeybind({
-        Name = "Tecla da Interface",
-        CurrentKey = Config.Keybind or Enum.KeyCode.K,
-        Flag = "Genim_Keybind",
-        Callback = function(NewKey)
-            Config.Keybind = NewKey
-            Genim:Notify({
-                Title = "Keybind Atualizada",
-                Content = "Nova tecla: " .. NewKey.Name,
-                Duration = 3
-            })
-        end
-    })
-
-    SettingsButton.MouseButton1Click:Connect(function()
-        Ripple(SettingsButton)
-        SettingsTab:Select()
-    end)
-    
     return Window
 end
 
