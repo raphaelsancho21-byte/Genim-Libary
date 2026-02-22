@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.7"
+Genim.Version = "v1.25.8"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -19,54 +19,27 @@ local CoreGui = game:GetService("CoreGui")
 
 -- Constants & Theme
 Genim.Themes = {
-    Default = {
+    Dark = {
         MainColor = Color3.fromRGB(15, 17, 26),
         AccentColor = Color3.fromRGB(26, 115, 232),
         SecondaryAccent = Color3.fromRGB(147, 51, 234),
-        TextColor = Color3.fromRGB(248, 250, 252),
-        SecondaryTextColor = Color3.fromRGB(148, 163, 184),
-        StrokeColor = Color3.fromRGB(30, 41, 59),
-        DarkerColor = Color3.fromRGB(10, 12, 20)
-    },
-    Carbon = {
-        MainColor = Color3.fromRGB(20, 20, 20),
-        AccentColor = Color3.fromRGB(200, 200, 200),
-        SecondaryAccent = Color3.fromRGB(150, 150, 150),
         TextColor = Color3.fromRGB(255, 255, 255),
         SecondaryTextColor = Color3.fromRGB(160, 160, 160),
-        StrokeColor = Color3.fromRGB(40, 40, 40),
-        DarkerColor = Color3.fromRGB(15, 15, 15)
+        StrokeColor = Color3.fromRGB(35, 40, 55),
+        DarkerColor = Color3.fromRGB(10, 12, 18)
     },
-    Midnight = {
-        MainColor = Color3.fromRGB(0, 0, 0),
-        AccentColor = Color3.fromRGB(255, 255, 255),
-        SecondaryAccent = Color3.fromRGB(200, 200, 200),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(150, 150, 150),
-        StrokeColor = Color3.fromRGB(30, 30, 30),
-        DarkerColor = Color3.fromRGB(5, 5, 5)
-    },
-    Crimson = {
-        MainColor = Color3.fromRGB(15, 5, 5),
-        AccentColor = Color3.fromRGB(220, 38, 38),
-        SecondaryAccent = Color3.fromRGB(153, 27, 27),
-        TextColor = Color3.fromRGB(250, 240, 240),
-        SecondaryTextColor = Color3.fromRGB(150, 120, 120),
-        StrokeColor = Color3.fromRGB(45, 15, 15),
-        DarkerColor = Color3.fromRGB(10, 2, 2)
-    },
-    Ocean = {
-        MainColor = Color3.fromRGB(5, 15, 25),
-        AccentColor = Color3.fromRGB(14, 165, 233),
-        SecondaryAccent = Color3.fromRGB(7, 89, 133),
-        TextColor = Color3.fromRGB(240, 249, 255),
-        SecondaryTextColor = Color3.fromRGB(125, 150, 170),
-        StrokeColor = Color3.fromRGB(15, 35, 55),
-        DarkerColor = Color3.fromRGB(2, 8, 15)
+    Light = {
+        MainColor = Color3.fromRGB(245, 246, 250),
+        AccentColor = Color3.fromRGB(37, 99, 235),
+        SecondaryAccent = Color3.fromRGB(79, 70, 229),
+        TextColor = Color3.fromRGB(15, 23, 42),
+        SecondaryTextColor = Color3.fromRGB(100, 116, 139),
+        StrokeColor = Color3.fromRGB(220, 225, 235),
+        DarkerColor = Color3.fromRGB(235, 238, 245)
     }
 }
 
-Genim.Theme = Genim.Themes.Default
+Genim.Theme = Genim.Themes.Dark
 
 -- Utility Functions
 local function Create(class, props)
@@ -151,7 +124,7 @@ function Genim:CreateWindow(Config)
 
     Config = Config or {}
     Config.Name = Config.Name or "Genim Library"
-    Config.Theme = Config.Theme or "Default"
+    Config.Theme = Config.Theme or "Dark"
     
     local KeySystem = Config.KeySystem or false
     local KeySettings = Config.KeySettings or {}
