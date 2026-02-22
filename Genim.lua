@@ -1035,6 +1035,8 @@ function Genim:CreateWindow(Config)
                     end
                 end
             }
+        end
+
         function Tab:CreateKeybind(Props)
             Props = Props or {}
             Props.Name = Props.Name or "Keybind"
