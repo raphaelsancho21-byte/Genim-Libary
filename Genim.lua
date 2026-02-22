@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.25.6"
+Genim.Version = "v1.25.7"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -1182,6 +1182,14 @@ function Genim:CreateWindow(Config)
             
             task.wait(0.5)
             LoadingFrame:Destroy()
+            
+            if Config.StartupNotification then
+                Genim:Notify(Config.NotificationConfig or {
+                    Title = "Genim Library",
+                    Content = "Interface carregada com sucesso!",
+                    Duration = 5
+                })
+            end
         end)
     end
 
