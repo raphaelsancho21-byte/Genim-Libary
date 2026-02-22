@@ -5,8 +5,15 @@ local Window = Genim:CreateWindow({
     Name = "Genim Showcase",
     Theme = "Default", -- Temas: "Default", "Ocean", "Amethyst", "Emerald", "Light"
     LoadingTitle = "Genim Interface",
-    LoadingSubtitle = "by Raphael Sancho",
-    Keybind = Enum.KeyCode.K -- Tecla para esconder/mostrar
+    LoadingSubtitle = "by Genim Team",
+    Keybind = Enum.KeyCode.K, -- Tecla para esconder/mostrar
+    KeySystem = true, -- Ativa o sistema de Key
+    KeySettings = {
+        Title = "Sistema de Verificação",
+        Subtitle = "Pegue a key no nosso Discord",
+        Link = "https://120347.oneapp.dev/",
+        Key = "GENIM-2026" -- A chave secreta
+    }
 })
 
 -- ==========================================
