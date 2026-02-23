@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.2"
+Genim.Version = "v1.27.2" -- a cada modify no script suba 0.00.1 na versão 
 Genim.NotifyHolder = nil
 
 -- Services
@@ -295,7 +295,7 @@ function Genim:CreateWindow(Config)
         Position = UDim2.new(1, -38, 0, 0),
         Size = UDim2.new(0, 38, 1, 0),
         Font = Enum.Font.GothamBold,
-        Text = "✕",
+        Text = "X",
         TextColor3 = Genim.Theme.SecondaryTextColor,
         TextSize = 13,
         AutoButtonColor = false
