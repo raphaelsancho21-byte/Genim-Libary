@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.0"
+Genim.Version = "v1.27.1"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -215,7 +215,7 @@ function Genim:CreateWindow(Config)
 
     
     Create("UICorner", {
-        CornerRadius = UDim.new(0, 10),
+        CornerRadius = UDim.new(0, 12),
         Parent = MainFrame
     })
     
@@ -250,25 +250,41 @@ function Genim:CreateWindow(Config)
         Parent = MainFrame,
         BackgroundColor3 = Genim.Theme.DarkerColor,
         BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 0, 40)
-        
+        Size = UDim2.new(1, 0, 0, 44)
     })
 
     Create("UICorner", {
-        CornerRadius = UDim.new(0, 10),
+        CornerRadius = UDim.new(0, 12),
         Parent = TopBar
+    })
+
+    -- Accent underline on TopBar
+    local TopBarLine = Create("Frame", {
+        Name = "AccentLine",
+        Parent = TopBar,
+        BackgroundColor3 = Genim.Theme.AccentColor,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 0, 1, -1),
+        Size = UDim2.new(1, 0, 0, 1)
+    })
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+        }),
+        Parent = TopBarLine
     })
 
     local Title = Create("TextLabel", {
         Name = "Title",
         Parent = TopBar,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 15, 0, 0),
-        Size = UDim2.new(1, -60, 1, 0),
+        Position = UDim2.new(0, 16, 0, 0),
+        Size = UDim2.new(1, -70, 1, 0),
         Font = Enum.Font.GothamBold,
         Text = Config.Name,
         TextColor3 = Genim.Theme.TextColor,
-        TextSize = 14,
+        TextSize = 15,
         TextXAlignment = Enum.TextXAlignment.Left
     })
 
@@ -276,12 +292,12 @@ function Genim:CreateWindow(Config)
         Name = "CloseButton",
         Parent = TopBar,
         BackgroundTransparency = 1,
-        Position = UDim2.new(1, -35, 0, 0),
-        Size = UDim2.new(0, 35, 1, 0),
+        Position = UDim2.new(1, -38, 0, 0),
+        Size = UDim2.new(0, 38, 1, 0),
         Font = Enum.Font.GothamBold,
-        Text = "X",
+        Text = "✕",
         TextColor3 = Genim.Theme.SecondaryTextColor,
-        TextSize = 14,
+        TextSize = 13,
         AutoButtonColor = false
     })
 
@@ -335,13 +351,26 @@ function Genim:CreateWindow(Config)
         Parent = MainFrame,
         BackgroundColor3 = Genim.Theme.DarkerColor,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 0, 40),
-        Size = UDim2.new(0, 140, 1, -40)
+        Position = UDim2.new(0, 0, 0, 44),
+        Size = UDim2.new(0, 155, 1, -44)
     })
 
     Create("UICorner", {
-        CornerRadius = UDim.new(0, 10),
+        CornerRadius = UDim.new(0, 12),
         Parent = SideBar
+    })
+
+    -- Sidebar label
+    Create("TextLabel", {
+        Parent = SideBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 12, 0, 8),
+        Size = UDim2.new(1, -12, 0, 16),
+        Font = Enum.Font.GothamBold,
+        Text = "NAVEGAÇÃO",
+        TextColor3 = Genim.Theme.AccentColor,
+        TextSize = 9,
+        TextXAlignment = Enum.TextXAlignment.Left
     })
     
     local SideBarList = Create("ScrollingFrame", {
@@ -349,11 +378,11 @@ function Genim:CreateWindow(Config)
         Parent = SideBar,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 5, 0, 10),
-        Size = UDim2.new(1, -10, 1, -20),
-        ScrollBarThickness = 3,
+        Position = UDim2.new(0, 8, 0, 28),
+        Size = UDim2.new(1, -16, 1, -36),
+        ScrollBarThickness = 2,
         ScrollBarImageColor3 = Genim.Theme.AccentColor,
-        ScrollBarImageTransparency = 0,
+        ScrollBarImageTransparency = 0.4,
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         ElasticBehavior = Enum.ElasticBehavior.Always,
@@ -363,7 +392,7 @@ function Genim:CreateWindow(Config)
     
     local SideBarLayout = Create("UIListLayout", {
         Parent = SideBarList,
-        Padding = UDim.new(0, 5),
+        Padding = UDim.new(0, 4),
         SortOrder = Enum.SortOrder.LayoutOrder
     })
 
@@ -376,8 +405,8 @@ function Genim:CreateWindow(Config)
         Name = "Container",
         Parent = MainFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 140, 0, 40),
-        Size = UDim2.new(1, -140, 1, -40),
+        Position = UDim2.new(0, 155, 0, 44),
+        Size = UDim2.new(1, -155, 1, -44),
         ClipsDescendants = true
     })
 
@@ -385,11 +414,12 @@ function Genim:CreateWindow(Config)
         Name = "Version",
         Parent = MainFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 5, 1, -18),
-        Size = UDim2.new(0, 100, 0, 15),
+        Position = UDim2.new(0, 8, 1, -18),
+        Size = UDim2.new(0, 120, 0, 14),
         Font = Enum.Font.GothamMedium,
         Text = Genim.Version,
-        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextColor3 = Genim.Theme.AccentColor,
+        TextTransparency = 0.4,
         TextSize = 10,
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 110
@@ -543,18 +573,31 @@ function Genim:CreateWindow(Config)
             BackgroundColor3 = Genim.Theme.AccentColor,
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Size = UDim2.new(1, 0, 0, 32),
+            Size = UDim2.new(1, 0, 0, 36),
             AutoButtonColor = false,
             Font = Enum.Font.GothamSemibold,
-            Text = Name,
+            Text = "  " .. Name,
             TextColor3 = Genim.Theme.SecondaryTextColor,
-            TextSize = 13
+            TextSize = 13,
+            TextXAlignment = Enum.TextXAlignment.Left
         })
         
         Create("UICorner", {
-            CornerRadius = UDim.new(0, 6),
+            CornerRadius = UDim.new(0, 8),
             Parent = TabButton
         })
+
+        -- Active left-bar indicator
+        local TabIndicator = Create("Frame", {
+            Name = "Indicator",
+            Parent = TabButton,
+            BackgroundColor3 = Genim.Theme.AccentColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 0, 0.2, 0),
+            Size = UDim2.new(0, 3, 0.6, 0),
+            Visible = false
+        })
+        Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = TabIndicator })
         
         local TabContent = Create("CanvasGroup", {
             Name = Name .. "Content",
@@ -607,30 +650,37 @@ function Genim:CreateWindow(Config)
         function Tab:CreateSection(Name)
             local SectionFrame = Create("Frame", {
                 Name = Name .. "Section",
-                Parent = TabContent,
+                Parent = TabScroll,
                 BackgroundColor3 = Genim.Theme.AccentColor,
-                BackgroundTransparency = 0.9,
+                BackgroundTransparency = 0.88,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 26)
+                Size = UDim2.new(0.92, 0, 0, 28)
             })
             
             Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
+                CornerRadius = UDim.new(0, 7),
                 Parent = SectionFrame
             })
+
+            Create("Frame", {
+                Parent = SectionFrame,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 0, 0.2, 0),
+                Size = UDim2.new(0, 3, 0.6, 0)
+            })
             
-            local SectionTitle = Create("TextLabel", {
+            Create("TextLabel", {
                 Name = "Title",
                 Parent = SectionFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 0),
-                Size = UDim2.new(1, -12, 1, 0),
+                Position = UDim2.new(0, 14, 0, 0),
+                Size = UDim2.new(1, -14, 1, 0),
                 Font = Enum.Font.GothamBold,
                 Text = Name:upper(),
                 TextColor3 = Genim.Theme.AccentColor,
-                TextSize = 11,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                LetterSpacing = 1
+                TextSize = 10,
+                TextXAlignment = Enum.TextXAlignment.Left
             })
 
             return SectionFrame
@@ -647,7 +697,7 @@ function Genim:CreateWindow(Config)
                 BackgroundColor3 = Genim.Theme.DarkerColor,
                 BackgroundTransparency = 0.2,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.9, 0, 0, 38)
+                Size = UDim2.new(0.92, 0, 0, 40)
             })
             
             Create("UICorner", {
@@ -717,11 +767,13 @@ function Genim:CreateWindow(Config)
             Props.Callback = Props.Callback or function() end
             local Toggled = Props.CurrentValue
 
+            local ToggleFrame = Create("Frame", {
+                Name = Props.Name .. "Toggle",
                 Parent = TabScroll,
                 BackgroundColor3 = Genim.Theme.DarkerColor,
                 BackgroundTransparency = 0.2,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.9, 0, 0, 38)
+                Size = UDim2.new(0.92, 0, 0, 40)
             })
             
             Create("UICorner", {
@@ -818,11 +870,13 @@ function Genim:CreateWindow(Config)
             Props.Callback = Props.Callback or function() end
             local Value = Props.CurrentValue
 
+            local SliderFrame = Create("Frame", {
+                Name = Props.Name .. "Slider",
                 Parent = TabScroll,
                 BackgroundColor3 = Genim.Theme.DarkerColor,
                 BackgroundTransparency = 0.2,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.9, 0, 0, 48)
+                Size = UDim2.new(0.92, 0, 0, 52)
             })
             
             Create("UICorner", {
@@ -961,11 +1015,13 @@ function Genim:CreateWindow(Config)
             Props.Placeholder = Props.Placeholder or "Type here..."
             Props.Callback = Props.Callback or function() end
 
+            local InputFrame = Create("Frame", {
+                Name = Props.Name .. "Input",
                 Parent = TabScroll,
                 BackgroundColor3 = Genim.Theme.DarkerColor,
                 BackgroundTransparency = 0.2,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.9, 0, 0, 38)
+                Size = UDim2.new(0.92, 0, 0, 40)
             })
             
             Create("UICorner", {
@@ -1037,11 +1093,13 @@ function Genim:CreateWindow(Config)
             local Selected = Props.CurrentOption
             local Opened = false
 
+            local DropdownFrame = Create("Frame", {
+                Name = Props.Name .. "Dropdown",
                 Parent = TabScroll,
                 BackgroundColor3 = Genim.Theme.DarkerColor,
                 BackgroundTransparency = 0.2,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.9, 0, 0, 38),
+                Size = UDim2.new(0.92, 0, 0, 40),
                 ClipsDescendants = true
             })
             
@@ -1115,7 +1173,7 @@ function Genim:CreateWindow(Config)
                 Opened = State
                 Tween(Arrow, 0.2, {Rotation = Opened and 270 or 90})
                 
-                local ContentSize = 38
+                local ContentSize = 40
                 if Opened then
                     for _, option in pairs(Props.Options) do
                         ContentSize = ContentSize + 28
@@ -1123,7 +1181,7 @@ function Genim:CreateWindow(Config)
                     ContentSize = ContentSize + 5
                 end
                 
-                Tween(DropdownFrame, 0.3, {Size = UDim2.new(0.9, 0, 0, ContentSize)})
+                Tween(DropdownFrame, 0.3, {Size = UDim2.new(0.92, 0, 0, ContentSize)})
             end
 
             local function Update(Value, Save)
@@ -1208,22 +1266,24 @@ function Genim:CreateWindow(Config)
         function Tab:Select()
             if Window.CurrentTab then
                 local OldContent = Window.CurrentTab.Content
-                Tween(Window.CurrentTab.Button, 0.3, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
-                
-                -- Animate out old content
+                local OldBtn = Window.CurrentTab.Button
+                Tween(OldBtn, 0.25, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
+                local OldInd = OldBtn:FindFirstChild("Indicator")
+                if OldInd then OldInd.Visible = false end
                 task.spawn(function()
-                    Tween(OldContent, 0.2, {Position = UDim2.new(0, 0, 0, 15), GroupTransparency = 1})
+                    Tween(OldContent, 0.2, {Position = UDim2.new(0, 0, 0, 12), GroupTransparency = 1})
                     task.wait(0.2)
                     OldContent.Visible = false
+                    OldContent.Position = UDim2.new(0, 0, 0, 0)
                 end)
             end
             
             TabContent.Visible = true
-            TabContent.Position = UDim2.new(0, 0, 0, 10)
+            TabContent.Position = UDim2.new(0, 0, 0, 12)
             TabContent.GroupTransparency = 1
-            
-            Tween(TabContent, 0.4, {Position = UDim2.new(0, 0, 0, 0), GroupTransparency = 0})
-            Tween(TabButton, 0.3, {BackgroundTransparency = 0.8, TextColor3 = Genim.Theme.TextColor})
+            Tween(TabContent, 0.35, {Position = UDim2.new(0, 0, 0, 0), GroupTransparency = 0})
+            Tween(TabButton, 0.25, {BackgroundTransparency = 0.85, TextColor3 = Genim.Theme.TextColor})
+            TabIndicator.Visible = true
             Window.CurrentTab = {Button = TabButton, Content = TabContent}
         end
         
@@ -1332,7 +1392,7 @@ function Genim:CreateWindow(Config)
         if Toggled then
             MainFrame.Visible = true
             MainFrame.Size = UDim2.new(0, 0, 0, 0)
-            Tween(MainFrame, 0.5, {Size = UDim2.new(0, 500, 0, 350)})
+            Tween(MainFrame, 0.5, {Size = UDim2.new(0, 560, 0, 380)})
             -- Intro sequence for aesthetics
             task.spawn(function()
                 MainFrame.GroupTransparency = 1
@@ -1394,7 +1454,7 @@ function Genim:CreateWindow(Config)
         task.spawn(function()
             MainFrame.Visible = true
             Tween(MainFrame, 0.6, {
-                Size = UDim2.new(0, 500, 0, 350),
+                Size = UDim2.new(0, 560, 0, 380),
                 Position = UDim2.new(0.5, 0, 0.5, 0)
             })
             task.wait(0.6)
