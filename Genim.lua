@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.2" -- a cada modify no script suba 0.00.1 na versão 
+Genim.Version = "v1.27.3"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -1525,9 +1525,113 @@ function Genim:CreateWindow(Config)
 
         KClose.MouseButton1Click:Connect(function()
             Ripple(KClose)
-            Tween(KeyFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
-            task.wait(0.4)
-            ScreenGui:Destroy()
+
+            -- Confirmation dialog (same style as main window)
+            local KOverlay = Create("TextButton", {
+                Name = "KOverlay",
+                Parent = KeyFrame,
+                BackgroundColor3 = Color3.new(0, 0, 0),
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = "",
+                AutoButtonColor = false,
+                ZIndex = 200
+            })
+
+            local KDialog = Create("CanvasGroup", {
+                Parent = KOverlay,
+                BackgroundColor3 = Genim.Theme.MainColor,
+                BackgroundTransparency = 0.05,
+                BorderSizePixel = 0,
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                Size = UDim2.new(0, 0, 0, 0),
+                ClipsDescendants = true,
+                ZIndex = 201
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = KDialog })
+            local KDS = Create("UIStroke", { Color = Color3.new(1,1,1), Thickness = 1, Transparency = 0.5, Parent = KDialog })
+            Create("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                }),
+                Parent = KDS
+            })
+
+            Create("TextLabel", {
+                Parent = KDialog,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 15, 0, 15),
+                Size = UDim2.new(1, -30, 0, 20),
+                Font = Enum.Font.GothamBold,
+                Text = "Fechar Interface?",
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 15,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 202
+            })
+            Create("TextLabel", {
+                Parent = KDialog,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 15, 0, 42),
+                Size = UDim2.new(1, -30, 0, 40),
+                Font = Enum.Font.GothamMedium,
+                Text = "Você tem certeza que deseja fechar o script?",
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextWrapped = true,
+                ZIndex = 202
+            })
+
+            local KBtnContainer = Create("Frame", {
+                Parent = KDialog,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 15, 1, -45),
+                Size = UDim2.new(1, -30, 0, 30),
+                ZIndex = 202
+            })
+            Create("UIListLayout", {
+                Parent = KBtnContainer,
+                FillDirection = Enum.FillDirection.Horizontal,
+                HorizontalAlignment = Enum.HorizontalAlignment.Right,
+                Padding = UDim.new(0, 10)
+            })
+
+            local function CloseKDialog()
+                Tween(KDialog, 0.25, {Size = UDim2.new(0, 0, 0, 0)})
+                Tween(KOverlay, 0.25, {BackgroundTransparency = 1})
+                task.wait(0.25)
+                KOverlay:Destroy()
+            end
+
+            -- "Sim" button
+            local YesBtn = Create("Frame", { Parent = KBtnContainer, BackgroundColor3 = Genim.Theme.AccentColor, BorderSizePixel = 0, Size = UDim2.new(0, 80, 1, 0), ZIndex = 203 })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = YesBtn })
+            local YesTxt = Create("TextButton", { Parent = YesBtn, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), Font = Enum.Font.GothamBold, Text = "Sim", TextColor3 = Color3.new(1,1,1), TextSize = 12, AutoButtonColor = false, ZIndex = 204 })
+            YesTxt.MouseButton1Click:Connect(function()
+                Ripple(YesBtn)
+                CloseKDialog()
+                task.wait(0.25)
+                Tween(KeyFrame, 0.35, {Size = UDim2.new(0, 0, 0, 0)})
+                task.wait(0.35)
+                ScreenGui:Destroy()
+            end)
+
+            -- "Não" button
+            local NoBtn = Create("Frame", { Parent = KBtnContainer, BackgroundColor3 = Genim.Theme.DarkerColor, BorderSizePixel = 0, Size = UDim2.new(0, 80, 1, 0), ZIndex = 203 })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = NoBtn })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = NoBtn })
+            local NoTxt = Create("TextButton", { Parent = NoBtn, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), Font = Enum.Font.GothamBold, Text = "Não", TextColor3 = Genim.Theme.TextColor, TextSize = 12, AutoButtonColor = false, ZIndex = 204 })
+            NoTxt.MouseButton1Click:Connect(function()
+                Ripple(NoBtn)
+                CloseKDialog()
+            end)
+
+            -- Animate dialog in
+            Tween(KOverlay, 0.3, {BackgroundTransparency = 0.5})
+            Tween(KDialog, 0.35, {Size = UDim2.new(0, 280, 0, 140)})
         end)
 
         local KTitle = Create("TextLabel", {
