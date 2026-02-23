@@ -6,10 +6,8 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.26.1"
+Genim.Version = "v1.26.3"
 Genim.NotifyHolder = nil
-Genim.Flags = {}
-Genim.ConfigSettings = {Folder = nil, File = nil}
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -136,23 +134,6 @@ function Genim:CreateWindow(Config)
         Genim.Theme = Genim.Themes[Config.Theme]
     end
     
-    -- Config System Initialization
-    if Config.Configuration and Config.Configuration.FolderName and Config.Configuration.ConfigName then
-        Genim.ConfigSettings.Folder = Config.Configuration.FolderName
-        Genim.ConfigSettings.File = Config.Configuration.ConfigName
-        
-        -- Load existing config
-        local path = Genim.ConfigSettings.Folder .. "/" .. Genim.ConfigSettings.File .. ".json"
-        if isfile and isfile(path) then
-            local success, content = pcall(readfile, path)
-            if success then
-                local success2, data = pcall(function() return HttpService:JSONDecode(content) end)
-                if success2 then
-                    Genim.Flags = data
-                end
-            end
-        end
-    end
     
     local ScreenGui = Create("ScreenGui", {
         Name = "Genim_" .. HttpService:GenerateGUID(false):sub(1, 8),
@@ -256,9 +237,26 @@ function Genim:CreateWindow(Config)
 
     CloseButton.MouseButton1Click:Connect(function()
         Ripple(CloseButton)
-        Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
-        task.wait(0.4)
-        ScreenGui:Destroy()
+        Window:CreateDialog({
+            Title = "Fechar Interface?",
+            Content = "Você tem certeza que deseja fechar o script? Isso irá encerrar todas as funções.",
+            Buttons = {
+                {
+                    Name = "Sim",
+                    Primary = true,
+                    Callback = function()
+                        Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
+                        task.wait(0.4)
+                        ScreenGui:Destroy()
+                    end
+                },
+                {
+                    Name = "Não",
+                    Primary = false,
+                    Callback = function() end
+                }
+            }
+        })
     end)
     
     -- Gemini Gradient for Title or Accent
@@ -338,6 +336,131 @@ function Genim:CreateWindow(Config)
         ZIndex = 110
     })
     
+    function Window:CreateDialog(Props)
+        Props = Props or {}
+        Props.Title = Props.Title or "Dialog"
+        Props.Content = Props.Content or "Are you sure?"
+        Props.Buttons = Props.Buttons or {
+            {Name = "Confirm", Primary = true, Callback = function() end},
+            {Name = "Cancel", Primary = false, Callback = function() end}
+        }
+
+        local Overlay = Create("TextButton", {
+            Name = "Overlay",
+            Parent = MainFrame,
+            BackgroundColor3 = Color3.new(0, 0, 0),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            Text = "",
+            AutoButtonColor = false,
+            ZIndex = 200
+        })
+
+        local DialogFrame = Create("Frame", {
+            Name = "Dialog",
+            Parent = Overlay,
+            BackgroundColor3 = Genim.Theme.MainColor,
+            BorderSizePixel = 0,
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            Size = UDim2.new(0, 0, 0, 0),
+            ClipsDescendants = true,
+            ZIndex = 201
+        })
+
+        Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = DialogFrame })
+        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1.2, Parent = DialogFrame })
+
+        local DTitle = Create("TextLabel", {
+            Parent = DialogFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 15, 0, 15),
+            Size = UDim2.new(1, -30, 0, 20),
+            Font = Enum.Font.GothamBold,
+            Text = Props.Title,
+            TextColor3 = Genim.Theme.TextColor,
+            TextSize = 16,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 202
+        })
+
+        local DContent = Create("TextLabel", {
+            Parent = DialogFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 15, 0, 45),
+            Size = UDim2.new(1, -30, 0, 40),
+            Font = Enum.Font.GothamMedium,
+            Text = Props.Content,
+            TextColor3 = Genim.Theme.SecondaryTextColor,
+            TextSize = 13,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Top,
+            TextWrapped = true,
+            ZIndex = 202
+        })
+
+        local ButtonContainer = Create("Frame", {
+            Parent = DialogFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 15, 1, -45),
+            Size = UDim2.new(1, -30, 0, 30),
+            ZIndex = 202
+        })
+
+        local Layout = Create("UIListLayout", {
+            Parent = ButtonContainer,
+            FillDirection = Enum.FillDirection.Horizontal,
+            HorizontalAlignment = Enum.HorizontalAlignment.Right,
+            Padding = UDim.new(0, 10),
+            SortOrder = Enum.SortOrder.LayoutOrder
+        })
+
+        local function CloseDialog()
+            Tween(DialogFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0)})
+            Tween(Overlay, 0.3, {BackgroundTransparency = 1})
+            task.wait(0.3)
+            Overlay:Destroy()
+        end
+
+        for i, btn in pairs(Props.Buttons) do
+            local BFrame = Create("Frame", {
+                Name = btn.Name .. "Button",
+                Parent = ButtonContainer,
+                BackgroundColor3 = btn.Primary and Genim.Theme.AccentColor or Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Size = UDim2.new(0, 80, 1, 0),
+                LayoutOrder = i,
+                ZIndex = 203
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = BFrame })
+            if not btn.Primary then
+                Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = BFrame })
+            end
+
+            local BText = Create("TextButton", {
+                Parent = BFrame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = btn.Name,
+                TextColor3 = btn.Primary and Color3.new(1, 1, 1) or Genim.Theme.TextColor,
+                TextSize = 12,
+                AutoButtonColor = false,
+                ZIndex = 204
+            })
+
+            BText.MouseButton1Click:Connect(function()
+                Ripple(BFrame)
+                task.spawn(btn.Callback)
+                CloseDialog()
+            end)
+        end
+
+        -- Animate In
+        Tween(Overlay, 0.3, {BackgroundTransparency = 0.5})
+        Tween(DialogFrame, 0.4, {Size = UDim2.new(0, 300, 0, 140)})
+    end
+
     local Window = {
         CurrentTab = nil,
         Tabs = {}
@@ -510,14 +633,8 @@ function Genim:CreateWindow(Config)
             Props = Props or {}
             Props.Name = Props.Name or "Toggle"
             Props.CurrentValue = Props.CurrentValue or false
-            Props.Flag = Props.Flag or nil
             Props.Callback = Props.Callback or function() end
-            
             local Toggled = Props.CurrentValue
-
-            if Props.Flag and Genim.Flags[Props.Flag] ~= nil then
-                Toggled = Genim.Flags[Props.Flag]
-            end
 
             local ToggleFrame = Create("Frame", {
                 Name = Props.Name .. "Toggle",
@@ -592,11 +709,6 @@ function Genim:CreateWindow(Config)
                     Tween(InnerToggle, 0.2, {Position = UDim2.new(0, 2, 0.5, -7)})
                 end
                 
-                if Props.Flag then
-                    Genim.Flags[Props.Flag] = Toggled
-                    if Save then Genim:SaveConfiguration() end
-                end
-                
                 Props.Callback(Toggled)
             end
 
@@ -623,14 +735,8 @@ function Genim:CreateWindow(Config)
             Props.Min = Props.Min or 0
             Props.Max = Props.Max or 100
             Props.CurrentValue = Props.CurrentValue or 50
-            Props.Flag = Props.Flag or nil
             Props.Callback = Props.Callback or function() end
-            
             local Value = Props.CurrentValue
-
-            if Props.Flag and Genim.Flags[Props.Flag] ~= nil then
-                Value = Genim.Flags[Props.Flag]
-            end
 
             local SliderFrame = Create("Frame", {
                 Name = Props.Name .. "Slider",
@@ -731,11 +837,6 @@ function Genim:CreateWindow(Config)
                 
                 ValueLabel.Text = tostring(Value)
                 Tween(SliderFill, 0.1, {Size = UDim2.new(Percentage, 0, 1, 0)})
-                
-                if Props.Flag then
-                    Genim.Flags[Props.Flag] = Value
-                    if Save then Genim:SaveConfiguration() end
-                end
                 
                 Props.Callback(Value)
             end
@@ -854,15 +955,9 @@ function Genim:CreateWindow(Config)
             Props.Name = Props.Name or "Dropdown"
             Props.Options = Props.Options or {"Option 1", "Option 2"}
             Props.CurrentOption = Props.CurrentOption or Props.Options[1]
-            Props.Flag = Props.Flag or nil
             Props.Callback = Props.Callback or function() end
-            
             local Selected = Props.CurrentOption
             local Opened = false
-
-            if Props.Flag and Genim.Flags[Props.Flag] ~= nil then
-                Selected = Genim.Flags[Props.Flag]
-            end
 
             local DropdownFrame = Create("Frame", {
                 Name = Props.Name .. "Dropdown",
@@ -964,11 +1059,6 @@ function Genim:CreateWindow(Config)
                     end
                 end
                 
-                if Props.Flag then
-                    Genim.Flags[Props.Flag] = Selected
-                    if Save then Genim:SaveConfiguration() end
-                end
-                
                 Props.Callback(Selected)
             end
 
@@ -1037,85 +1127,6 @@ function Genim:CreateWindow(Config)
             }
         end
 
-        function Tab:CreateKeybind(Props)
-            Props = Props or {}
-            Props.Name = Props.Name or "Keybind"
-            Props.CurrentKey = Props.CurrentKey or Enum.KeyCode.K
-            Props.Flag = Props.Flag or nil
-            Props.Callback = Props.Callback or function() end
-
-            local Key = Props.CurrentKey
-            local Binding = false
-
-            if Props.Flag and Genim.Flags[Props.Flag] then
-                local success, keycode = pcall(function() return Enum.KeyCode[Genim.Flags[Props.Flag]] end)
-                if success then Key = keycode end
-            end
-
-            local KeybindFrame = Create("Frame", {
-                Name = Props.Name .. "Keybind",
-                Parent = TabContent,
-                BackgroundColor3 = Genim.Theme.DarkerColor,
-                BorderSizePixel = 0,
-                Size = UDim2.new(0.9, 0, 0, 38)
-            })
-            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = KeybindFrame })
-            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KeybindFrame })
-
-            local Label = Create("TextLabel", {
-                Parent = KeybindFrame,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 0),
-                Size = UDim2.new(1, -100, 1, 0),
-                Font = Enum.Font.GothamMedium,
-                Text = Props.Name,
-                TextColor3 = Genim.Theme.TextColor,
-                TextSize = 13,
-                TextXAlignment = Enum.TextXAlignment.Left
-            })
-
-            local KeyButton = Create("TextButton", {
-                Parent = KeybindFrame,
-                BackgroundColor3 = Color3.fromRGB(30, 41, 59),
-                Position = UDim2.new(1, -90, 0.5, -11),
-                Size = UDim2.new(0, 80, 0, 22),
-                Font = Enum.Font.GothamBold,
-                Text = Key.Name,
-                TextColor3 = Genim.Theme.AccentColor,
-                TextSize = 12,
-                AutoButtonColor = false
-            })
-            Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = KeyButton })
-
-            KeyButton.MouseButton1Click:Connect(function()
-                Binding = true
-                KeyButton.Text = "..."
-                local inputConn
-                inputConn = UserInputService.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.Keyboard then
-                        Key = input.KeyCode
-                        KeyButton.Text = Key.Name
-                        Binding = false
-                        inputConn:Disconnect()
-                        
-                        if Props.Flag then
-                            Genim.Flags[Props.Flag] = Key.Name
-                            Genim:SaveConfiguration()
-                        end
-                        
-                        Props.Callback(Key)
-                    end
-                end)
-            end)
-
-            return {
-                Set = function(_, NewKey)
-                    Key = NewKey
-                    KeyButton.Text = Key.Name
-                    Props.Callback(Key)
-                end
-            }
-        end
 
         function Tab:Select()
 
@@ -1471,27 +1482,6 @@ end
 
 
 
-function Genim:SaveConfiguration()
-    if not Genim.ConfigSettings or not Genim.ConfigSettings.Folder or not Genim.ConfigSettings.File then return end
-    
-    local folder = Genim.ConfigSettings.Folder
-    local file = Genim.ConfigSettings.File
-    
-    if isfolder and makefile and not isfolder(folder) then 
-        makefolder(folder) 
-    end
-    
-    local data = HttpService:JSONEncode(Genim.Flags)
-    local success, err = pcall(function()
-        if writefile then
-            writefile(folder .. "/" .. file .. ".json", data)
-        end
-    end)
-    
-    if not success then
-        warn("Genim: Erro ao salvar configuração: " .. tostring(err))
-    end
-end
 
 function Genim:Notify(Config)
     Config = Config or {}
