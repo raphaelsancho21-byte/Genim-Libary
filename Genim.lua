@@ -6,8 +6,9 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.4"
+Genim.Version = "v1.27.5"
 Genim.NotifyHolder = nil
+Genim.Plugins = {} -- Persistent modular functions
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -156,6 +157,18 @@ end
 
 -- Library Methods
 
+function Genim:AddPlugin(Callback)
+    table.insert(Genim.Plugins, Callback)
+end
+
+function Genim:RunPlugins(Window)
+    for _, Callback in pairs(Genim.Plugins) do
+        task.spawn(function()
+            Callback(Window)
+        end)
+    end
+end
+
 function Genim:CreateWindow(Config)
 
     Config = Config or {}
@@ -199,6 +212,11 @@ function Genim:CreateWindow(Config)
     })
     
     Genim.NotifyHolder = NotifyHolder
+    
+    -- Automatic Plugins Execution
+    task.spawn(function()
+        Genim:RunPlugins(Window)
+    end)
     
     -- Main Container
     local MainFrame = Create("CanvasGroup", {
@@ -309,24 +327,33 @@ function Genim:CreateWindow(Config)
         Position = UDim2.new(1, -70, 0, 0),
         Size = UDim2.new(0, 32, 1, 0),
         Font = Enum.Font.GothamBold,
-        Text = "⚙",
-        TextColor3 = Genim.Theme.SecondaryTextColor,
-        TextSize = 16,
+        Text = "", -- Using Image instead of Emoji for reliability
         AutoButtonColor = false
     })
 
+    local SettingsIcon = Create("ImageLabel", {
+        Parent = SettingsButton,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 7, 0, 7),
+        Size = UDim2.new(0, 18, 0, 18),
+        Image = "rbxassetid://15132379512", -- Gear/Settings icon
+        ImageColor3 = Genim.Theme.SecondaryTextColor
+    })
+
     SettingsButton.MouseEnter:Connect(function()
-        Tween(SettingsButton, 0.2, {TextColor3 = Genim.Theme.AccentColor, Rotation = 45})
+        Tween(SettingsIcon, 0.2, {ImageColor3 = Genim.Theme.AccentColor, Rotation = 45})
     end)
 
     SettingsButton.MouseLeave:Connect(function()
-        Tween(SettingsButton, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor, Rotation = 0})
+        Tween(SettingsIcon, 0.2, {ImageColor3 = Genim.Theme.SecondaryTextColor, Rotation = 0})
     end)
 
     SettingsButton.MouseButton1Click:Connect(function()
         Ripple(SettingsButton)
         if Window.SettingsTab then
             Window.SettingsTab:Select()
+        else
+            warn("[Genim] Settings tab not registered. Use ConfigModule:AddConfigTab(Window)")
         end
     end)
 
