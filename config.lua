@@ -5,9 +5,10 @@
 
 local ConfigModule = {}
 
-function ConfigModule:AddConfigTab(Window)
-    local ConfigTab = Window:CreateTab("Ajustes", 10734898801) -- Icon for settings
-    Window.SettingsTab = ConfigTab -- Link for TopBar button
+function ConfigModule:Init(Window)
+    print("[Genim] Inicializando Aba de Configurações...")
+    local ConfigTab = Window:CreateTab("Ajustes", 15132379512)
+    Window.SettingsTab = ConfigTab -- Vincula ao botão da TopBar
 
     ConfigTab:CreateSection("Interface & Atalhos")
 
@@ -56,12 +57,22 @@ function ConfigModule:AddConfigTab(Window)
         Name = "Copiar Discord",
         Callback = function()
             setclipboard("https://discord.gg/genim")
-            -- We can use Notify directly if we have access to Genim
-            -- In a real scenario, Genim would be global or passed.
+            Genim:Notify({
+                Title = "Discord",
+                Content = "Link copiado para a área de transferência!",
+                Duration = 3
+            })
         end
     })
 
     return ConfigTab
+end
+
+-- Registro automático como Plugin (Persistente)
+if Genim and Genim.AddPlugin then
+    Genim:AddPlugin(function(Window)
+        ConfigModule:Init(Window)
+    end)
 end
 
 return ConfigModule
