@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.1"
+Genim.Version = "v1.27.2"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -1264,25 +1264,31 @@ function Genim:CreateWindow(Config)
 
 
         function Tab:Select()
+            -- Guard: if this tab is already active, do nothing
+            if Window.CurrentTab and Window.CurrentTab.Content == TabContent then
+                return
+            end
+
+            -- Hide old tab content IMMEDIATELY to avoid overlap ghost
             if Window.CurrentTab then
                 local OldContent = Window.CurrentTab.Content
                 local OldBtn = Window.CurrentTab.Button
-                Tween(OldBtn, 0.25, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
+                -- Instantly hide and reset old content
+                OldContent.Visible = false
+                OldContent.GroupTransparency = 0
+                OldContent.Position = UDim2.new(0, 0, 0, 0)
+                -- Deactivate old button
+                Tween(OldBtn, 0.2, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
                 local OldInd = OldBtn:FindFirstChild("Indicator")
                 if OldInd then OldInd.Visible = false end
-                task.spawn(function()
-                    Tween(OldContent, 0.2, {Position = UDim2.new(0, 0, 0, 12), GroupTransparency = 1})
-                    task.wait(0.2)
-                    OldContent.Visible = false
-                    OldContent.Position = UDim2.new(0, 0, 0, 0)
-                end)
             end
-            
+
+            -- Animate new tab content in
             TabContent.Visible = true
-            TabContent.Position = UDim2.new(0, 0, 0, 12)
+            TabContent.Position = UDim2.new(0, 0, 0, 10)
             TabContent.GroupTransparency = 1
-            Tween(TabContent, 0.35, {Position = UDim2.new(0, 0, 0, 0), GroupTransparency = 0})
-            Tween(TabButton, 0.25, {BackgroundTransparency = 0.85, TextColor3 = Genim.Theme.TextColor})
+            Tween(TabContent, 0.3, {Position = UDim2.new(0, 0, 0, 0), GroupTransparency = 0})
+            Tween(TabButton, 0.2, {BackgroundTransparency = 0.85, TextColor3 = Genim.Theme.TextColor})
             TabIndicator.Visible = true
             Window.CurrentTab = {Button = TabButton, Content = TabContent}
         end
