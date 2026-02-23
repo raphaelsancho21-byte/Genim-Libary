@@ -134,6 +134,9 @@ function Genim:CreateWindow(Config)
         Genim.Theme = Genim.Themes[Config.Theme]
     end
     
+    local Window = {}
+    Window.Tabs = {}
+    Window.CurrentTab = nil
     
     local ScreenGui = Create("ScreenGui", {
         Name = "Genim_" .. HttpService:GenerateGUID(false):sub(1, 8),
@@ -461,10 +464,7 @@ function Genim:CreateWindow(Config)
         Tween(DialogFrame, 0.4, {Size = UDim2.new(0, 300, 0, 140)})
     end
 
-    local Window = {
-        CurrentTab = nil,
-        Tabs = {}
-    }
+    -- Window properties already initialized
     
     function Window:CreateTab(Name, Icon)
         local TabButton = Create("TextButton", {
