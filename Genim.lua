@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.3"
+Genim.Version = "v1.27.4"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -173,6 +173,7 @@ function Genim:CreateWindow(Config)
     local Window = {}
     Window.Tabs = {}
     Window.CurrentTab = nil
+    Window.OriginalConfig = Config -- Store for restarts
     
     local ScreenGui = Create("ScreenGui", {
         Name = "Genim_" .. HttpService:GenerateGUID(false):sub(1, 8),
@@ -300,6 +301,34 @@ function Genim:CreateWindow(Config)
         TextSize = 13,
         AutoButtonColor = false
     })
+
+    local SettingsButton = Create("TextButton", {
+        Name = "SettingsButton",
+        Parent = TopBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(1, -70, 0, 0),
+        Size = UDim2.new(0, 32, 1, 0),
+        Font = Enum.Font.GothamBold,
+        Text = "⚙",
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 16,
+        AutoButtonColor = false
+    })
+
+    SettingsButton.MouseEnter:Connect(function()
+        Tween(SettingsButton, 0.2, {TextColor3 = Genim.Theme.AccentColor, Rotation = 45})
+    end)
+
+    SettingsButton.MouseLeave:Connect(function()
+        Tween(SettingsButton, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor, Rotation = 0})
+    end)
+
+    SettingsButton.MouseButton1Click:Connect(function()
+        Ripple(SettingsButton)
+        if Window.SettingsTab then
+            Window.SettingsTab:Select()
+        end
+    end)
 
 
     CloseButton.MouseEnter:Connect(function()
@@ -562,6 +591,36 @@ function Genim:CreateWindow(Config)
         -- Animate In
         Tween(Overlay, 0.3, {BackgroundTransparency = 0.5})
         Tween(DialogFrame, 0.4, {Size = UDim2.new(0, 300, 0, 140)})
+    end
+
+    function Window:Restart(NewTheme)
+        local CurrentPos = MainFrame.Position
+        local OldScreen = ScreenGui
+        
+        -- Update config
+        Window.OriginalConfig.Theme = NewTheme
+        Window.OriginalConfig.KeySystem = false -- Disable key system on restart for UX
+        Window.OriginalConfig.StartupNotification = false
+        
+        -- Flash effect
+        local Flash = Create("Frame", {
+            Parent = ScreenGui,
+            BackgroundColor3 = Color3.new(1, 1, 1),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            ZIndex = 1000
+        })
+        
+        Tween(Flash, 0.2, {BackgroundTransparency = 0.5})
+        task.wait(0.2)
+        
+        -- Re-open window logic (simplified)
+        local NewWindow = Genim:CreateWindow(Window.OriginalConfig)
+        
+        -- Cleanup
+        OldScreen:Destroy()
+        
+        return NewWindow
     end
 
     -- Window properties already initialized
@@ -1416,9 +1475,9 @@ function Genim:CreateWindow(Config)
     end
 
     -- Keybind Listener
-    local Keybind = Config.Keybind or Enum.KeyCode.K
+    Window.Keybind = Config.Keybind or Enum.KeyCode.K
     UserInputService.InputBegan:Connect(function(input, gpe)
-        if not gpe and input.KeyCode == Keybind then
+        if not gpe and input.KeyCode == Window.Keybind then
             Window:Toggle()
         end
     end)
