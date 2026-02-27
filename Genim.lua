@@ -3,11 +3,13 @@
     Inspired by Gemini Aesthetic
     
     A standalone, premium UI library for Roblox.
+    Enhanced Edition with advanced visual effects.
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.6"
+Genim.Version = "v1.27.8"
 Genim.NotifyHolder = nil
+Genim.Plugins = {}
 
 -- Services
 local UserInputService = game:GetService("UserInputService")
@@ -16,68 +18,123 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
+local TextService = game:GetService("TextService")
 
 -- Constants & Theme
 Genim.Themes = {
     Dark = {
-        MainColor = Color3.fromRGB(15, 17, 26),
-        AccentColor = Color3.fromRGB(26, 115, 232),
-        SecondaryAccent = Color3.fromRGB(147, 51, 234),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(160, 160, 160),
-        StrokeColor = Color3.fromRGB(35, 40, 55),
-        DarkerColor = Color3.fromRGB(10, 12, 18)
+        MainColor = Color3.fromRGB(12, 14, 22),
+        AccentColor = Color3.fromRGB(99, 102, 241),
+        SecondaryAccent = Color3.fromRGB(168, 85, 247),
+        TextColor = Color3.fromRGB(245, 245, 250),
+        SecondaryTextColor = Color3.fromRGB(140, 140, 165),
+        StrokeColor = Color3.fromRGB(30, 34, 50),
+        DarkerColor = Color3.fromRGB(8, 10, 16),
+        ElementColor = Color3.fromRGB(18, 20, 32),
+        SuccessColor = Color3.fromRGB(34, 197, 94),
+        WarningColor = Color3.fromRGB(250, 204, 21),
+        ErrorColor = Color3.fromRGB(239, 68, 68),
+        InfoColor = Color3.fromRGB(56, 189, 248),
+        ShadowColor = Color3.fromRGB(0, 0, 0)
     },
     Light = {
-        MainColor = Color3.fromRGB(245, 246, 250),
-        AccentColor = Color3.fromRGB(37, 99, 235),
-        SecondaryAccent = Color3.fromRGB(79, 70, 229),
+        MainColor = Color3.fromRGB(248, 249, 253),
+        AccentColor = Color3.fromRGB(79, 70, 229),
+        SecondaryAccent = Color3.fromRGB(147, 51, 234),
         TextColor = Color3.fromRGB(15, 23, 42),
         SecondaryTextColor = Color3.fromRGB(100, 116, 139),
-        StrokeColor = Color3.fromRGB(220, 225, 235),
-        DarkerColor = Color3.fromRGB(235, 238, 245)
+        StrokeColor = Color3.fromRGB(215, 220, 235),
+        DarkerColor = Color3.fromRGB(238, 240, 248),
+        ElementColor = Color3.fromRGB(242, 244, 250),
+        SuccessColor = Color3.fromRGB(22, 163, 74),
+        WarningColor = Color3.fromRGB(234, 179, 8),
+        ErrorColor = Color3.fromRGB(220, 38, 38),
+        InfoColor = Color3.fromRGB(14, 165, 233),
+        ShadowColor = Color3.fromRGB(150, 150, 170)
     },
     Amethyst = {
-        MainColor = Color3.fromRGB(13, 11, 22),
+        MainColor = Color3.fromRGB(13, 10, 24),
         AccentColor = Color3.fromRGB(168, 85, 247),
         SecondaryAccent = Color3.fromRGB(236, 72, 153),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(148, 163, 184),
-        StrokeColor = Color3.fromRGB(30, 27, 46),
-        DarkerColor = Color3.fromRGB(9, 8, 15)
+        TextColor = Color3.fromRGB(250, 245, 255),
+        SecondaryTextColor = Color3.fromRGB(148, 130, 184),
+        StrokeColor = Color3.fromRGB(35, 25, 55),
+        DarkerColor = Color3.fromRGB(9, 7, 18),
+        ElementColor = Color3.fromRGB(18, 14, 32),
+        SuccessColor = Color3.fromRGB(34, 197, 94),
+        WarningColor = Color3.fromRGB(250, 204, 21),
+        ErrorColor = Color3.fromRGB(239, 68, 68),
+        InfoColor = Color3.fromRGB(192, 132, 252),
+        ShadowColor = Color3.fromRGB(5, 3, 12)
     },
     Emerald = {
-        MainColor = Color3.fromRGB(6, 18, 16),
+        MainColor = Color3.fromRGB(6, 16, 14),
         AccentColor = Color3.fromRGB(16, 185, 129),
-        SecondaryAccent = Color3.fromRGB(5, 150, 105),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(110, 140, 130),
-        StrokeColor = Color3.fromRGB(20, 35, 30),
-        DarkerColor = Color3.fromRGB(4, 12, 11)
+        SecondaryAccent = Color3.fromRGB(52, 211, 153),
+        TextColor = Color3.fromRGB(240, 255, 250),
+        SecondaryTextColor = Color3.fromRGB(110, 145, 135),
+        StrokeColor = Color3.fromRGB(15, 35, 28),
+        DarkerColor = Color3.fromRGB(4, 10, 9),
+        ElementColor = Color3.fromRGB(10, 22, 18),
+        SuccessColor = Color3.fromRGB(16, 185, 129),
+        WarningColor = Color3.fromRGB(250, 204, 21),
+        ErrorColor = Color3.fromRGB(239, 68, 68),
+        InfoColor = Color3.fromRGB(52, 211, 153),
+        ShadowColor = Color3.fromRGB(2, 6, 5)
     },
     Ruby = {
-        MainColor = Color3.fromRGB(18, 6, 6),
+        MainColor = Color3.fromRGB(16, 6, 8),
         AccentColor = Color3.fromRGB(239, 68, 68),
-        SecondaryAccent = Color3.fromRGB(185, 28, 28),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(140, 100, 100),
-        StrokeColor = Color3.fromRGB(35, 20, 20),
-        DarkerColor = Color3.fromRGB(12, 4, 4)
+        SecondaryAccent = Color3.fromRGB(251, 113, 133),
+        TextColor = Color3.fromRGB(255, 245, 245),
+        SecondaryTextColor = Color3.fromRGB(160, 110, 115),
+        StrokeColor = Color3.fromRGB(40, 18, 22),
+        DarkerColor = Color3.fromRGB(10, 4, 5),
+        ElementColor = Color3.fromRGB(22, 10, 12),
+        SuccessColor = Color3.fromRGB(34, 197, 94),
+        WarningColor = Color3.fromRGB(250, 204, 21),
+        ErrorColor = Color3.fromRGB(239, 68, 68),
+        InfoColor = Color3.fromRGB(251, 146, 160),
+        ShadowColor = Color3.fromRGB(5, 2, 2)
     },
-    Glass = {
-        MainColor = Color3.fromRGB(15, 17, 26),
-        AccentColor = Color3.fromRGB(255, 255, 255),
-        SecondaryAccent = Color3.fromRGB(200, 200, 200),
-        TextColor = Color3.fromRGB(255, 255, 255),
-        SecondaryTextColor = Color3.fromRGB(180, 180, 180),
-        StrokeColor = Color3.fromRGB(255, 255, 255),
-        DarkerColor = Color3.fromRGB(10, 12, 18)
+    Ocean = {
+        MainColor = Color3.fromRGB(8, 12, 21),
+        AccentColor = Color3.fromRGB(56, 189, 248),
+        SecondaryAccent = Color3.fromRGB(99, 102, 241),
+        TextColor = Color3.fromRGB(240, 248, 255),
+        SecondaryTextColor = Color3.fromRGB(120, 150, 175),
+        StrokeColor = Color3.fromRGB(20, 30, 48),
+        DarkerColor = Color3.fromRGB(5, 8, 15),
+        ElementColor = Color3.fromRGB(12, 18, 30),
+        SuccessColor = Color3.fromRGB(34, 197, 94),
+        WarningColor = Color3.fromRGB(250, 204, 21),
+        ErrorColor = Color3.fromRGB(239, 68, 68),
+        InfoColor = Color3.fromRGB(56, 189, 248),
+        ShadowColor = Color3.fromRGB(2, 4, 8)
+    },
+    Sunset = {
+        MainColor = Color3.fromRGB(18, 10, 12),
+        AccentColor = Color3.fromRGB(251, 146, 60),
+        SecondaryAccent = Color3.fromRGB(244, 63, 94),
+        TextColor = Color3.fromRGB(255, 248, 240),
+        SecondaryTextColor = Color3.fromRGB(170, 130, 120),
+        StrokeColor = Color3.fromRGB(40, 25, 20),
+        DarkerColor = Color3.fromRGB(12, 7, 8),
+        ElementColor = Color3.fromRGB(24, 14, 16),
+        SuccessColor = Color3.fromRGB(34, 197, 94),
+        WarningColor = Color3.fromRGB(251, 146, 60),
+        ErrorColor = Color3.fromRGB(244, 63, 94),
+        InfoColor = Color3.fromRGB(251, 191, 36),
+        ShadowColor = Color3.fromRGB(6, 3, 4)
     }
 }
 
 Genim.Theme = Genim.Themes.Dark
 
--- Utility Functions
+-- ═══════════════════════════════════════════════════════
+-- UTILITY FUNCTIONS
+-- ═══════════════════════════════════════════════════════
+
 local function Create(class, props)
     local inst = Instance.new(class)
     for k, v in pairs(props) do
@@ -89,21 +146,27 @@ local function Create(class, props)
     return inst
 end
 
-local function Tween(inst, speed, props)
-    local info = TweenInfo.new(speed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+local function Tween(inst, speed, props, style, direction)
+    style = style or Enum.EasingStyle.Quart
+    direction = direction or Enum.EasingDirection.Out
+    local info = TweenInfo.new(speed, style, direction)
     local t = TweenService:Create(inst, info, props)
     t:Play()
     return t
 end
 
-local function Ripple(obj)
+local function TweenBounce(inst, speed, props)
+    return Tween(inst, speed, props, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+end
+
+local function Ripple(obj, color)
     task.spawn(function()
         local mouse = Players.LocalPlayer:GetMouse()
         local ripple = Create("Frame", {
             Name = "Ripple",
             Parent = obj,
-            BackgroundColor3 = Color3.new(1, 1, 1),
-            BackgroundTransparency = 0.8,
+            BackgroundColor3 = color or Color3.new(1, 1, 1),
+            BackgroundTransparency = 0.7,
             BorderSizePixel = 0,
             Position = UDim2.new(0, mouse.X - obj.AbsolutePosition.X, 0, mouse.Y - obj.AbsolutePosition.Y),
             Size = UDim2.new(0, 0, 0, 0),
@@ -111,50 +174,144 @@ local function Ripple(obj)
         })
         Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = ripple })
         
-        local size = math.max(obj.AbsoluteSize.X, obj.AbsoluteSize.Y) * 1.5
-        Tween(ripple, 0.4, {Size = UDim2.new(0, size, 0, size), Position = ripple.Position - UDim2.new(0, size/2, 0, size/2), BackgroundTransparency = 1})
-        task.wait(0.4)
+        local size = math.max(obj.AbsoluteSize.X, obj.AbsoluteSize.Y) * 2
+        Tween(ripple, 0.5, {
+            Size = UDim2.new(0, size, 0, size), 
+            Position = ripple.Position - UDim2.new(0, size/2, 0, size/2), 
+            BackgroundTransparency = 1
+        })
+        task.wait(0.5)
         ripple:Destroy()
     end)
 end
 
-local function MakeDraggable(TopBar, MainFrame)
-
-	local Dragging, DragInput, DragStart, StartPos
-
-	local function Update(Input)
-		local Delta = Input.Position - DragStart
-		MainFrame.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
-	end
-
-	TopBar.InputBegan:Connect(function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-			Dragging = true
-			DragStart = Input.Position
-			StartPos = MainFrame.Position
-
-			Input.Changed:Connect(function()
-				if Input.UserInputState == Enum.UserInputState.End then
-					Dragging = false
-				end
-			end)
-		end
-	end)
-
-	TopBar.InputChanged:Connect(function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-			DragInput = Input
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(Input)
-		if Input == DragInput and Dragging then
-			Update(Input)
-		end
-	end)
+local function GlowEffect(parent, color, size, transparency)
+    local glow = Create("ImageLabel", {
+        Name = "Glow",
+        Parent = parent,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Size = UDim2.new(1, size or 40, 1, size or 40),
+        Image = "rbxassetid://5028857084",
+        ImageColor3 = color or Genim.Theme.AccentColor,
+        ImageTransparency = transparency or 0.85,
+        ScaleType = Enum.ScaleType.Slice,
+        SliceCenter = Rect.new(24, 24, 276, 276),
+        ZIndex = parent.ZIndex - 1
+    })
+    return glow
 end
 
--- Library Methods
+local function CreateShadow(parent, transparency)
+    local shadow = Create("ImageLabel", {
+        Name = "Shadow",
+        Parent = parent,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0.5, 4),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Size = UDim2.new(1, 30, 1, 30),
+        Image = "rbxassetid://5028857084",
+        ImageColor3 = Genim.Theme.ShadowColor or Color3.fromRGB(0, 0, 0),
+        ImageTransparency = transparency or 0.6,
+        ScaleType = Enum.ScaleType.Slice,
+        SliceCenter = Rect.new(24, 24, 276, 276),
+        ZIndex = parent.ZIndex - 1
+    })
+    return shadow
+end
+
+local function CreateGradientBar(parent, height, position)
+    local bar = Create("Frame", {
+        Name = "GradientBar",
+        Parent = parent,
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BorderSizePixel = 0,
+        Position = position or UDim2.new(0, 0, 1, -height),
+        Size = UDim2.new(1, 0, 0, height or 2)
+    })
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(0.5, Genim.Theme.SecondaryAccent),
+            ColorSequenceKeypoint.new(1, Genim.Theme.AccentColor)
+        }),
+        Parent = bar
+    })
+    return bar
+end
+
+local function AnimateGradient(gradient)
+    task.spawn(function()
+        local offset = 0
+        while gradient and gradient.Parent do
+            offset = (offset + 0.005) % 1
+            gradient.Offset = Vector2.new(offset, 0)
+            RunService.Heartbeat:Wait()
+        end
+    end)
+end
+
+local function PulseAnimation(obj, prop, minVal, maxVal, speed)
+    task.spawn(function()
+        while obj and obj.Parent do
+            Tween(obj, speed or 1.5, {[prop] = minVal})
+            task.wait(speed or 1.5)
+            Tween(obj, speed or 1.5, {[prop] = maxVal})
+            task.wait(speed or 1.5)
+        end
+    end)
+end
+
+local function HoverEffect(frame, enterProps, leaveProps, speed)
+    speed = speed or 0.25
+    frame.MouseEnter:Connect(function()
+        Tween(frame, speed, enterProps)
+    end)
+    frame.MouseLeave:Connect(function()
+        Tween(frame, speed, leaveProps)
+    end)
+end
+
+local function MakeDraggable(TopBar, MainFrame)
+    local Dragging, DragInput, DragStart, StartPos
+
+    local function Update(Input)
+        local Delta = Input.Position - DragStart
+        local newPos = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
+        Tween(MainFrame, 0.08, {Position = newPos}, Enum.EasingStyle.Quad)
+    end
+
+    TopBar.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = Input.Position
+            StartPos = MainFrame.Position
+
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
+
+    TopBar.InputChanged:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+            DragInput = Input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if Input == DragInput and Dragging then
+            Update(Input)
+        end
+    end)
+end
+
+-- ═══════════════════════════════════════════════════════
+-- LIBRARY METHODS
+-- ═══════════════════════════════════════════════════════
 
 function Genim:AddPlugin(Callback)
     table.insert(Genim.Plugins, Callback)
@@ -169,10 +326,10 @@ function Genim:RunPlugins(Window)
 end
 
 function Genim:CreateWindow(Config)
-
     Config = Config or {}
     Config.Name = Config.Name or "Genim Library"
     Config.Theme = Config.Theme or "Dark"
+    Config.Size = Config.Size or UDim2.new(0, 620, 0, 420)
     
     local KeySystem = Config.KeySystem or false
     local KeySettings = Config.KeySettings or {}
@@ -189,29 +346,34 @@ function Genim:CreateWindow(Config)
     local ScreenGui = Create("ScreenGui", {
         Name = "Genim_" .. HttpService:GenerateGUID(false):sub(1, 8),
         Parent = (RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui")) or CoreGui,
-        ResetOnSpawn = false
+        ResetOnSpawn = false,
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     })
     
-    -- Notification Container
+    -- ═══════════════════════════════════════════════════════
+    -- NOTIFICATION CONTAINER
+    -- ═══════════════════════════════════════════════════════
     local NotifyHolder = Create("Frame", {
         Name = "NotifyHolder",
         Parent = ScreenGui,
         BackgroundTransparency = 1,
-        Position = UDim2.new(1, -310, 1, -20),
-        Size = UDim2.new(0, 300, 1, -20),
+        Position = UDim2.new(1, -340, 1, -20),
+        Size = UDim2.new(0, 330, 1, -20),
         AnchorPoint = Vector2.new(0, 1)
     })
     
     Create("UIListLayout", {
         Parent = NotifyHolder,
-        Padding = UDim.new(0, 10),
+        Padding = UDim.new(0, 12),
         VerticalAlignment = Enum.VerticalAlignment.Bottom,
         SortOrder = Enum.SortOrder.LayoutOrder
     })
     
-     Genim.NotifyHolder = NotifyHolder
- 
-     -- Main Container
+    Genim.NotifyHolder = NotifyHolder
+
+    -- ═══════════════════════════════════════════════════════
+    -- MAIN CONTAINER
+    -- ═══════════════════════════════════════════════════════
     local MainFrame = Create("CanvasGroup", {
         Name = "MainFrame",
         Parent = ScreenGui,
@@ -222,107 +384,193 @@ function Genim:CreateWindow(Config)
         Size = UDim2.new(0, 0, 0, 0),
         ClipsDescendants = true,
         Visible = false,
-        Transparency = 0.05
+        GroupTransparency = 0
     })
 
-    
     Create("UICorner", {
-        CornerRadius = UDim.new(0, 12),
+        CornerRadius = UDim.new(0, 14),
         Parent = MainFrame
     })
     
+    -- Main frame shadow
+    CreateShadow(MainFrame, 0.5)
+    
+    -- Animated accent border stroke
     local MainStroke = Create("UIStroke", {
         Color = Color3.new(1, 1, 1),
-        Thickness = 1,
+        Thickness = 1.5,
         Parent = MainFrame,
-        Transparency = 0.5
+        Transparency = 0.4
     })
     
-    Create("UIGradient", {
+    local MainStrokeGradient = Create("UIGradient", {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            ColorSequenceKeypoint.new(0.5, Genim.Theme.SecondaryAccent),
+            ColorSequenceKeypoint.new(1, Genim.Theme.AccentColor)
         }),
         Parent = MainStroke
     })
+    
+    -- Animate the stroke gradient
+    AnimateGradient(MainStrokeGradient)
 
-    -- Breathing effect for the Luminous Stroke
-    task.spawn(function()
-        while task.wait(3) do
-            if not MainStroke.Parent then break end
-            Tween(MainStroke, 1.5, {Transparency = 0.2})
-            task.wait(1.5)
-            Tween(MainStroke, 1.5, {Transparency = 0.6})
-        end
-    end)
+    -- Breathing effect for the stroke
+    PulseAnimation(MainStroke, "Transparency", 0.25, 0.65, 2)
 
-    -- TopBar
+    -- ═══════════════════════════════════════════════════════
+    -- TOPBAR
+    -- ═══════════════════════════════════════════════════════
     local TopBar = Create("Frame", {
         Name = "TopBar",
         Parent = MainFrame,
         BackgroundColor3 = Genim.Theme.DarkerColor,
         BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 0, 44)
+        Size = UDim2.new(1, 0, 0, 48),
+        ZIndex = 5
     })
 
     Create("UICorner", {
-        CornerRadius = UDim.new(0, 12),
+        CornerRadius = UDim.new(0, 14),
         Parent = TopBar
     })
+    
+    -- Cover bottom corners of topbar
+    Create("Frame", {
+        Name = "BottomCover",
+        Parent = TopBar,
+        BackgroundColor3 = Genim.Theme.DarkerColor,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 0, 1, -14),
+        Size = UDim2.new(1, 0, 0, 14),
+        ZIndex = 5
+    })
 
-    -- Accent underline on TopBar
-    local TopBarLine = Create("Frame", {
-        Name = "AccentLine",
+    -- Animated gradient line under topbar
+    local TopBarLine = CreateGradientBar(TopBar, 2, UDim2.new(0, 0, 1, -2))
+    TopBarLine.ZIndex = 6
+    local lineGrad = TopBarLine:FindFirstChildOfClass("UIGradient")
+    if lineGrad then AnimateGradient(lineGrad) end
+
+    -- Window Icon/Logo
+    local LogoFrame = Create("Frame", {
+        Name = "LogoFrame",
         Parent = TopBar,
         BackgroundColor3 = Genim.Theme.AccentColor,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -1),
-        Size = UDim2.new(1, 0, 0, 1)
+        Position = UDim2.new(0, 14, 0.5, -13),
+        Size = UDim2.new(0, 26, 0, 26),
+        ZIndex = 6
     })
+    Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = LogoFrame })
     Create("UIGradient", {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
             ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
         }),
-        Parent = TopBarLine
+        Rotation = 45,
+        Parent = LogoFrame
+    })
+    
+    local LogoText = Create("TextLabel", {
+        Parent = LogoFrame,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, 0),
+        Font = Enum.Font.GothamBlack,
+        Text = string.sub(Config.Name, 1, 1):upper(),
+        TextColor3 = Color3.new(1, 1, 1),
+        TextSize = 14,
+        ZIndex = 7
     })
 
     local Title = Create("TextLabel", {
         Name = "Title",
         Parent = TopBar,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 16, 0, 0),
-        Size = UDim2.new(1, -70, 1, 0),
+        Position = UDim2.new(0, 50, 0, 0),
+        Size = UDim2.new(1, -140, 1, 0),
         Font = Enum.Font.GothamBold,
         Text = Config.Name,
         TextColor3 = Genim.Theme.TextColor,
-        TextSize = 15,
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextSize = 16,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 6
     })
 
-    local CloseButton = Create("TextButton", {
-        Name = "CloseButton",
+    -- Window control buttons
+    local ControlsFrame = Create("Frame", {
+        Name = "Controls",
         Parent = TopBar,
         BackgroundTransparency = 1,
-        Position = UDim2.new(1, -38, 0, 0),
-        Size = UDim2.new(0, 38, 1, 0),
-        Font = Enum.Font.GothamBold,
-        Text = "X",
-        TextColor3 = Genim.Theme.SecondaryTextColor,
-        TextSize = 13,
-        AutoButtonColor = false
+        Position = UDim2.new(1, -90, 0, 0),
+        Size = UDim2.new(0, 90, 1, 0),
+        ZIndex = 6
     })
 
-     CloseButton.MouseEnter:Connect(function()
-        Tween(CloseButton, 0.2, {TextColor3 = Color3.fromRGB(255, 100, 100)})
+    -- Minimize Button
+    local MinButton = Create("TextButton", {
+        Name = "MinButton",
+        Parent = ControlsFrame,
+        BackgroundColor3 = Genim.Theme.ElementColor,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 5, 0.5, -13),
+        Size = UDim2.new(0, 26, 0, 26),
+        Font = Enum.Font.GothamBold,
+        Text = "—",
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 12,
+        AutoButtonColor = false,
+        ZIndex = 7
+    })
+    Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = MinButton })
+
+    MinButton.MouseEnter:Connect(function()
+        Tween(MinButton, 0.2, {BackgroundTransparency = 0.4, TextColor3 = Genim.Theme.WarningColor})
+    end)
+    MinButton.MouseLeave:Connect(function()
+        Tween(MinButton, 0.2, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
     end)
 
+    local Minimized = false
+    local OriginalSize = Config.Size
+
+    MinButton.MouseButton1Click:Connect(function()
+        Ripple(MinButton, Genim.Theme.WarningColor)
+        if not Minimized then
+            Minimized = true
+            Tween(MainFrame, 0.4, {Size = UDim2.new(0, OriginalSize.X.Offset, 0, 48)})
+        else
+            Minimized = false
+            Tween(MainFrame, 0.4, {Size = OriginalSize})
+        end
+    end)
+
+    -- Close Button
+    local CloseButton = Create("TextButton", {
+        Name = "CloseButton",
+        Parent = ControlsFrame,
+        BackgroundColor3 = Genim.Theme.ElementColor,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(1, -35, 0.5, -13),
+        Size = UDim2.new(0, 26, 0, 26),
+        Font = Enum.Font.GothamBold,
+        Text = "✕",
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 11,
+        AutoButtonColor = false,
+        ZIndex = 7
+    })
+    Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = CloseButton })
+
+    CloseButton.MouseEnter:Connect(function()
+        Tween(CloseButton, 0.2, {BackgroundTransparency = 0.4, BackgroundColor3 = Color3.fromRGB(200, 50, 50), TextColor3 = Color3.new(1, 1, 1)})
+    end)
     CloseButton.MouseLeave:Connect(function()
-        Tween(CloseButton, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor})
+        Tween(CloseButton, 0.2, {BackgroundTransparency = 1, BackgroundColor3 = Genim.Theme.ElementColor, TextColor3 = Genim.Theme.SecondaryTextColor})
     end)
 
     CloseButton.MouseButton1Click:Connect(function()
-        Ripple(CloseButton)
+        Ripple(CloseButton, Genim.Theme.ErrorColor)
         Window:CreateDialog({
             Title = "Fechar Interface?",
             Content = "Você tem certeza que deseja fechar o script? Isso irá encerrar todas as funções.",
@@ -331,8 +579,8 @@ function Genim:CreateWindow(Config)
                     Name = "Sim",
                     Primary = true,
                     Callback = function()
-                        Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
-                        task.wait(0.4)
+                        Tween(MainFrame, 0.5, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
+                        task.wait(0.5)
                         ScreenGui:Destroy()
                     end
                 },
@@ -344,44 +592,44 @@ function Genim:CreateWindow(Config)
             }
         })
     end)
-    
-    -- Gemini Gradient for Title or Accent
-    local Gradient = Create("UIGradient", {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
-        }),
-        Parent = Title
-    })
 
     MakeDraggable(TopBar, MainFrame)
     
-    -- Sidebar
+    -- ═══════════════════════════════════════════════════════
+    -- SIDEBAR
+    -- ═══════════════════════════════════════════════════════
     local SideBar = Create("Frame", {
         Name = "SideBar",
         Parent = MainFrame,
         BackgroundColor3 = Genim.Theme.DarkerColor,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 0, 44),
-        Size = UDim2.new(0, 155, 1, -44)
+        Position = UDim2.new(0, 0, 0, 48),
+        Size = UDim2.new(0, 165, 1, -48)
     })
 
-    Create("UICorner", {
-        CornerRadius = UDim.new(0, 12),
-        Parent = SideBar
+    -- Sidebar separator line
+    local SidebarSep = Create("Frame", {
+        Name = "Separator",
+        Parent = SideBar,
+        BackgroundColor3 = Genim.Theme.StrokeColor,
+        BorderSizePixel = 0,
+        Position = UDim2.new(1, -1, 0, 8),
+        Size = UDim2.new(0, 1, 1, -16),
+        BackgroundTransparency = 0.3
     })
 
-    -- Sidebar label
-    Create("TextLabel", {
+    -- Sidebar navigation label
+    local NavLabel = Create("TextLabel", {
         Parent = SideBar,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 12, 0, 8),
-        Size = UDim2.new(1, -12, 0, 16),
+        Position = UDim2.new(0, 14, 0, 10),
+        Size = UDim2.new(1, -14, 0, 14),
         Font = Enum.Font.GothamBold,
-        Text = "NAVEGAÇÃO",
+        Text = "⬡ NAVEGAÇÃO",
         TextColor3 = Genim.Theme.AccentColor,
         TextSize = 9,
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTransparency = 0.2
     })
     
     local SideBarList = Create("ScrollingFrame", {
@@ -389,11 +637,11 @@ function Genim:CreateWindow(Config)
         Parent = SideBar,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 8, 0, 28),
-        Size = UDim2.new(1, -16, 1, -36),
+        Position = UDim2.new(0, 8, 0, 30),
+        Size = UDim2.new(1, -18, 1, -40),
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = Genim.Theme.AccentColor,
-        ScrollBarImageTransparency = 0.4,
+        ScrollBarImageTransparency = 0.5,
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         ElasticBehavior = Enum.ElasticBehavior.Always,
@@ -411,31 +659,56 @@ function Genim:CreateWindow(Config)
         SideBarList.CanvasSize = UDim2.new(0, 0, 0, SideBarLayout.AbsoluteContentSize.Y + 10)
     end)
 
-    -- Container
+    -- ═══════════════════════════════════════════════════════
+    -- CONTENT CONTAINER
+    -- ═══════════════════════════════════════════════════════
     local Container = Create("Frame", {
         Name = "Container",
         Parent = MainFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 155, 0, 44),
-        Size = UDim2.new(1, -155, 1, -44),
+        Position = UDim2.new(0, 165, 0, 48),
+        Size = UDim2.new(1, -165, 1, -48),
         ClipsDescendants = true
     })
 
-    local VersionLabel = Create("TextLabel", {
-        Name = "Version",
+    -- Subtle background pattern/noise
+    local BgPattern = Create("Frame", {
+        Name = "BgPattern",
+        Parent = Container,
+        BackgroundColor3 = Genim.Theme.AccentColor,
+        BackgroundTransparency = 0.97,
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 0
+    })
+
+    -- Version label with styling
+    local VersionFrame = Create("Frame", {
+        Name = "VersionFrame",
         Parent = MainFrame,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 8, 1, -18),
-        Size = UDim2.new(0, 120, 0, 14),
-        Font = Enum.Font.GothamMedium,
-        Text = Genim.Version,
-        TextColor3 = Genim.Theme.AccentColor,
-        TextTransparency = 0.4,
-        TextSize = 10,
-        TextXAlignment = Enum.TextXAlignment.Left,
+        BackgroundColor3 = Genim.Theme.AccentColor,
+        BackgroundTransparency = 0.9,
+        Position = UDim2.new(0, 8, 1, -22),
+        Size = UDim2.new(0, 70, 0, 16),
         ZIndex = 110
     })
+    Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = VersionFrame })
+
+    Create("TextLabel", {
+        Name = "Version",
+        Parent = VersionFrame,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, 0),
+        Font = Enum.Font.GothamBold,
+        Text = "⚡ " .. Genim.Version,
+        TextColor3 = Genim.Theme.AccentColor,
+        TextTransparency = 0.3,
+        TextSize = 9,
+        ZIndex = 111
+    })
     
+    -- ═══════════════════════════════════════════════════════
+    -- DIALOG SYSTEM
+    -- ═══════════════════════════════════════════════════════
     function Window:CreateDialog(Props)
         Props = Props or {}
         Props.Title = Props.Title or "Dialog"
@@ -460,7 +733,6 @@ function Genim:CreateWindow(Config)
             Name = "Dialog",
             Parent = Overlay,
             BackgroundColor3 = Genim.Theme.MainColor,
-            BackgroundTransparency = 0.05,
             BorderSizePixel = 0,
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -469,27 +741,52 @@ function Genim:CreateWindow(Config)
             ZIndex = 201
         })
 
-        Create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = DialogFrame })
+        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = DialogFrame })
+        
         local DStroke = Create("UIStroke", {
             Color = Color3.new(1, 1, 1),
-            Thickness = 1,
+            Thickness = 1.5,
             Parent = DialogFrame,
-            Transparency = 0.5
+            Transparency = 0.4
         })
         
-        Create("UIGradient", {
+        local dStrokeGrad = Create("UIGradient", {
             Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
                 ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
             }),
             Parent = DStroke
         })
+        AnimateGradient(dStrokeGrad)
+        
+        CreateShadow(DialogFrame, 0.4)
+
+        -- Dialog icon
+        local DialogIcon = Create("Frame", {
+            Parent = DialogFrame,
+            BackgroundColor3 = Genim.Theme.AccentColor,
+            BackgroundTransparency = 0.85,
+            Position = UDim2.new(0, 18, 0, 18),
+            Size = UDim2.new(0, 32, 0, 32),
+            ZIndex = 202
+        })
+        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = DialogIcon })
+        Create("TextLabel", {
+            Parent = DialogIcon,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            Font = Enum.Font.GothamBold,
+            Text = "?",
+            TextColor3 = Genim.Theme.AccentColor,
+            TextSize = 18,
+            ZIndex = 203
+        })
 
         local DTitle = Create("TextLabel", {
             Parent = DialogFrame,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 15, 0, 15),
-            Size = UDim2.new(1, -30, 0, 20),
+            Position = UDim2.new(0, 58, 0, 18),
+            Size = UDim2.new(1, -70, 0, 20),
             Font = Enum.Font.GothamBold,
             Text = Props.Title,
             TextColor3 = Genim.Theme.TextColor,
@@ -501,8 +798,8 @@ function Genim:CreateWindow(Config)
         local DContent = Create("TextLabel", {
             Parent = DialogFrame,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 15, 0, 45),
-            Size = UDim2.new(1, -30, 0, 40),
+            Position = UDim2.new(0, 58, 0, 40),
+            Size = UDim2.new(1, -70, 0, 50),
             Font = Enum.Font.GothamMedium,
             Text = Props.Content,
             TextColor3 = Genim.Theme.SecondaryTextColor,
@@ -513,15 +810,26 @@ function Genim:CreateWindow(Config)
             ZIndex = 202
         })
 
-        local ButtonContainer = Create("Frame", {
+        -- Separator line
+        Create("Frame", {
             Parent = DialogFrame,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 15, 1, -45),
-            Size = UDim2.new(1, -30, 0, 30),
+            BackgroundColor3 = Genim.Theme.StrokeColor,
+            BackgroundTransparency = 0.3,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 18, 1, -55),
+            Size = UDim2.new(1, -36, 0, 1),
             ZIndex = 202
         })
 
-        local Layout = Create("UIListLayout", {
+        local ButtonContainer = Create("Frame", {
+            Parent = DialogFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 18, 1, -48),
+            Size = UDim2.new(1, -36, 0, 36),
+            ZIndex = 202
+        })
+
+        Create("UIListLayout", {
             Parent = ButtonContainer,
             FillDirection = Enum.FillDirection.Horizontal,
             HorizontalAlignment = Enum.HorizontalAlignment.Right,
@@ -530,7 +838,7 @@ function Genim:CreateWindow(Config)
         })
 
         local function CloseDialog()
-            Tween(DialogFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0)})
+            Tween(DialogFrame, 0.3, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
             Tween(Overlay, 0.3, {BackgroundTransparency = 1})
             task.wait(0.3)
             Overlay:Destroy()
@@ -540,14 +848,24 @@ function Genim:CreateWindow(Config)
             local BFrame = Create("Frame", {
                 Name = btn.Name .. "Button",
                 Parent = ButtonContainer,
-                BackgroundColor3 = btn.Primary and Genim.Theme.AccentColor or Genim.Theme.DarkerColor,
+                BackgroundColor3 = btn.Primary and Genim.Theme.AccentColor or Genim.Theme.ElementColor,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0, 80, 1, 0),
+                Size = UDim2.new(0, 90, 0, 32),
                 LayoutOrder = i,
                 ZIndex = 203
             })
-            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = BFrame })
-            if not btn.Primary then
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = BFrame })
+            
+            if btn.Primary then
+                Create("UIGradient", {
+                    Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                        ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                    }),
+                    Rotation = 90,
+                    Parent = BFrame
+                })
+            else
                 Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = BFrame })
             end
 
@@ -563,20 +881,28 @@ function Genim:CreateWindow(Config)
                 ZIndex = 204
             })
 
+            BFrame.MouseEnter:Connect(function()
+                Tween(BFrame, 0.15, {Size = UDim2.new(0, 94, 0, 34)})
+            end)
+            BFrame.MouseLeave:Connect(function()
+                Tween(BFrame, 0.15, {Size = UDim2.new(0, 90, 0, 32)})
+            end)
+
             BText.MouseButton1Click:Connect(function()
-                Ripple(BFrame)
+                Ripple(BFrame, btn.Primary and Color3.new(1,1,1) or Genim.Theme.AccentColor)
                 task.spawn(btn.Callback)
                 CloseDialog()
             end)
         end
 
-         -- Animate In
-         Tween(Overlay, 0.3, {BackgroundTransparency = 0.5})
-         Tween(DialogFrame, 0.4, {Size = UDim2.new(0, 300, 0, 140)})
-     end
+        -- Animate In
+        Tween(Overlay, 0.3, {BackgroundTransparency = 0.45})
+        TweenBounce(DialogFrame, 0.45, {Size = UDim2.new(0, 340, 0, 160)})
+    end
 
-    -- Window properties already initialized
-    
+    -- ═══════════════════════════════════════════════════════
+    -- TAB SYSTEM
+    -- ═══════════════════════════════════════════════════════
     function Window:CreateTab(Name, Icon)
         local TabButton = Create("TextButton", {
             Name = Name .. "Tab",
@@ -584,10 +910,10 @@ function Genim:CreateWindow(Config)
             BackgroundColor3 = Genim.Theme.AccentColor,
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Size = UDim2.new(1, 0, 0, 36),
+            Size = UDim2.new(1, 0, 0, 38),
             AutoButtonColor = false,
             Font = Enum.Font.GothamSemibold,
-            Text = "  " .. Name,
+            Text = "",
             TextColor3 = Genim.Theme.SecondaryTextColor,
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left
@@ -598,17 +924,76 @@ function Genim:CreateWindow(Config)
             Parent = TabButton
         })
 
-        -- Active left-bar indicator
+        -- Tab icon area
+        local TabIconFrame = Create("Frame", {
+            Name = "IconFrame",
+            Parent = TabButton,
+            BackgroundColor3 = Genim.Theme.AccentColor,
+            BackgroundTransparency = 0.9,
+            Position = UDim2.new(0, 6, 0.5, -12),
+            Size = UDim2.new(0, 24, 0, 24),
+            ZIndex = 2
+        })
+        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = TabIconFrame })
+
+        local TabIconLabel = Create("TextLabel", {
+            Parent = TabIconFrame,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            Font = Enum.Font.GothamBold,
+            Text = Icon or "◆",
+            TextColor3 = Genim.Theme.AccentColor,
+            TextSize = 11,
+            ZIndex = 3
+        })
+
+        local TabLabel = Create("TextLabel", {
+            Name = "Label",
+            Parent = TabButton,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 36, 0, 0),
+            Size = UDim2.new(1, -42, 1, 0),
+            Font = Enum.Font.GothamSemibold,
+            Text = Name,
+            TextColor3 = Genim.Theme.SecondaryTextColor,
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd,
+            ZIndex = 2
+        })
+
+        -- Active left-bar indicator with gradient
         local TabIndicator = Create("Frame", {
             Name = "Indicator",
             Parent = TabButton,
             BackgroundColor3 = Genim.Theme.AccentColor,
             BorderSizePixel = 0,
-            Position = UDim2.new(0, 0, 0.2, 0),
-            Size = UDim2.new(0, 3, 0.6, 0),
-            Visible = false
+            Position = UDim2.new(0, 0, 0.15, 0),
+            Size = UDim2.new(0, 3, 0.7, 0),
+            Visible = false,
+            ZIndex = 3
         })
         Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = TabIndicator })
+        Create("UIGradient", {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            }),
+            Rotation = 90,
+            Parent = TabIndicator
+        })
+
+        -- Hover effect for inactive tabs
+        TabButton.MouseEnter:Connect(function()
+            if Window.CurrentTab and Window.CurrentTab.Button == TabButton then return end
+            Tween(TabButton, 0.2, {BackgroundTransparency = 0.92})
+            Tween(TabLabel, 0.2, {TextColor3 = Genim.Theme.TextColor})
+        end)
+        TabButton.MouseLeave:Connect(function()
+            if Window.CurrentTab and Window.CurrentTab.Button == TabButton then return end
+            Tween(TabButton, 0.2, {BackgroundTransparency = 1})
+            Tween(TabLabel, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor})
+        end)
         
         local TabContent = Create("CanvasGroup", {
             Name = Name .. "Content",
@@ -626,9 +1011,9 @@ function Genim:CreateWindow(Config)
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
             Size = UDim2.new(1, 0, 1, 0),
-            ScrollBarThickness = 2,
+            ScrollBarThickness = 3,
             ScrollBarImageColor3 = Genim.Theme.AccentColor,
-            ScrollBarImageTransparency = 0.4,
+            ScrollBarImageTransparency = 0.5,
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ElasticBehavior = Enum.ElasticBehavior.Always,
@@ -643,42 +1028,54 @@ function Genim:CreateWindow(Config)
             HorizontalAlignment = Enum.HorizontalAlignment.Center
         })
 
-        -- Robust Manual Update with Extra Padding
         TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabScroll.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 50)
+            TabScroll.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 60)
         end)
         
         Create("UIPadding", {
             Parent = TabScroll,
-            PaddingTop = UDim.new(0, 10),
-            PaddingBottom = UDim.new(0, 10)
+            PaddingTop = UDim.new(0, 12),
+            PaddingBottom = UDim.new(0, 12)
         })
 
         local Tab = {
             Elements = {}
         }
         
+        -- ═══════════════════════════════════════════════════════
+        -- SECTION
+        -- ═══════════════════════════════════════════════════════
         function Tab:CreateSection(Name)
             local SectionFrame = Create("Frame", {
                 Name = Name .. "Section",
                 Parent = TabScroll,
                 BackgroundColor3 = Genim.Theme.AccentColor,
-                BackgroundTransparency = 0.88,
+                BackgroundTransparency = 0.92,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 28)
+                Size = UDim2.new(0.93, 0, 0, 30)
             })
             
             Create("UICorner", {
-                CornerRadius = UDim.new(0, 7),
+                CornerRadius = UDim.new(0, 8),
                 Parent = SectionFrame
             })
 
-            Create("Frame", {
+            -- Accent bar
+            local sBar = Create("Frame", {
                 Parent = SectionFrame,
-                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundColor3 = Color3.new(1, 1, 1),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0.2, 0),
-                Size = UDim2.new(0, 3, 0.6, 0)
+                Position = UDim2.new(0, 0, 0.15, 0),
+                Size = UDim2.new(0, 3, 0.7, 0)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = sBar })
+            Create("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                }),
+                Rotation = 90,
+                Parent = sBar
             })
             
             Create("TextLabel", {
@@ -687,289 +1084,451 @@ function Genim:CreateWindow(Config)
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0, 14, 0, 0),
                 Size = UDim2.new(1, -14, 1, 0),
-                Font = Enum.Font.GothamBold,
-                Text = Name:upper(),
+                Font = Enum.Font.GothamBlack,
+                Text = "  " .. Name:upper(),
                 TextColor3 = Genim.Theme.AccentColor,
                 TextSize = 10,
-                TextXAlignment = Enum.TextXAlignment.Left
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTransparency = 0.15
             })
 
             return SectionFrame
         end
 
-        function Tab:CreateButton(Props)
-            Props = Props or {}
-            Props.Name = Props.Name or "Button"
-            Props.Callback = Props.Callback or function() end
-            
-            local ButtonFrame = Create("Frame", {
-                Name = Props.Name .. "Button",
+        -- ═══════════════════════════════════════════════════════
+        -- LABEL
+        -- ═══════════════════════════════════════════════════════
+        function Tab:CreateLabel(Text, Icon)
+            local LabelFrame = Create("Frame", {
+                Name = "Label",
                 Parent = TabScroll,
-                BackgroundColor3 = Genim.Theme.DarkerColor,
-                BackgroundTransparency = 0.2,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.3,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 40)
+                Size = UDim2.new(0.93, 0, 0, 32)
             })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = LabelFrame })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = ButtonFrame
-            })
-            
-            Create("UIStroke", {
-                Color = Genim.Theme.StrokeColor,
-                Thickness = 1,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-                Parent = ButtonFrame
-            })
-
-            local Button = Create("TextButton", {
-                Name = "Interact",
-                Parent = ButtonFrame,
+            Create("TextLabel", {
+                Parent = LabelFrame,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                Size = UDim2.new(1, -24, 1, 0),
                 Font = Enum.Font.GothamMedium,
-                Text = Props.Name,
-                TextColor3 = Genim.Theme.TextColor,
-                TextSize = 13,
-                AutoButtonColor = false
+                Text = (Icon or "ℹ️") .. "  " .. (Text or "Label"),
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
             })
-
-            local Icon = Create("ImageLabel", {
-                Name = "Icon",
-                Parent = ButtonFrame,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(1, -30, 0.5, -9),
-                Size = UDim2.new(0, 18, 0, 18),
-                Image = "rbxassetid://15132379512", -- Simple click icon
-                ImageColor3 = Genim.Theme.SecondaryTextColor
-            })
-
-            Button.MouseEnter:Connect(function()
-                Tween(ButtonFrame, 0.2, {BackgroundColor3 = Genim.Theme.StrokeColor})
-            end)
-            
-            Button.MouseLeave:Connect(function()
-                Tween(ButtonFrame, 0.2, {BackgroundColor3 = Genim.Theme.DarkerColor})
-            end)
-            
-            Button.MouseButton1Down:Connect(function()
-                Ripple(ButtonFrame)
-                Tween(ButtonFrame, 0.1, {Size = UDim2.new(0.88, 0, 0, 36)})
-            end)
-
-            
-            Button.MouseButton1Up:Connect(function()
-                Tween(ButtonFrame, 0.1, {Size = UDim2.new(0.9, 0, 0, 38)})
-                Props.Callback()
-            end)
 
             return {
-                Set = function(_, NewName)
-                    Button.Text = NewName
+                Set = function(_, NewText)
+                    LabelFrame:FindFirstChildOfClass("TextLabel").Text = (Icon or "ℹ️") .. "  " .. NewText
                 end
             }
         end
 
-        function Tab:CreateToggle(Props)
+        -- ═══════════════════════════════════════════════════════
+        -- PARAGRAPH
+        -- ═══════════════════════════════════════════════════════
+        function Tab:CreateParagraph(Props)
             Props = Props or {}
-            Props.Name = Props.Name or "Toggle"
-            Props.CurrentValue = Props.CurrentValue or false
-            Props.Callback = Props.Callback or function() end
-            local Toggled = Props.CurrentValue
+            Props.Title = Props.Title or "Paragraph"
+            Props.Content = Props.Content or "Content text here."
 
-            local ToggleFrame = Create("Frame", {
-                Name = Props.Name .. "Toggle",
+            local textH = TextService:GetTextSize(Props.Content, 12, Enum.Font.GothamMedium, Vector2.new(380, 1000)).Y
+
+            local ParagraphFrame = Create("Frame", {
+                Name = "Paragraph",
                 Parent = TabScroll,
-                BackgroundColor3 = Genim.Theme.DarkerColor,
-                BackgroundTransparency = 0.2,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.15,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 40)
+                Size = UDim2.new(0.93, 0, 0, 42 + textH)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = ParagraphFrame })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Transparency = 0.3, Parent = ParagraphFrame })
+
+            Create("TextLabel", {
+                Parent = ParagraphFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 14, 0, 10),
+                Size = UDim2.new(1, -28, 0, 18),
+                Font = Enum.Font.GothamBold,
+                Text = Props.Title,
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            Create("TextLabel", {
+                Parent = ParagraphFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 14, 0, 30),
+                Size = UDim2.new(1, -28, 0, textH + 8),
+                Font = Enum.Font.GothamMedium,
+                Text = Props.Content,
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextYAlignment = Enum.TextYAlignment.Top,
+                TextWrapped = true
+            })
+
+            return ParagraphFrame
+        end
+
+        -- ═══════════════════════════════════════════════════════
+        -- BUTTON (Enhanced)
+        -- ═══════════════════════════════════════════════════════
+        function Tab:CreateButton(Props)
+            Props = Props or {}
+            Props.Name = Props.Name or "Button"
+            Props.Callback = Props.Callback or function() end
+            Props.Description = Props.Description or nil
+            
+            local height = Props.Description and 52 or 42
+            
+            local ButtonFrame = Create("Frame", {
+                Name = Props.Name .. "Button",
+                Parent = TabScroll,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
+                BorderSizePixel = 0,
+                Size = UDim2.new(0.93, 0, 0, height),
+                ClipsDescendants = true
             })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = ToggleFrame
-            })
-            
-            Create("UIStroke", {
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = ButtonFrame })
+            local bStroke = Create("UIStroke", {
                 Color = Genim.Theme.StrokeColor,
                 Thickness = 1,
-                Parent = ToggleFrame
+                Transparency = 0.2,
+                Parent = ButtonFrame
             })
 
-            local Title = Create("TextLabel", {
-                Parent = ToggleFrame,
+            Create("TextLabel", {
+                Parent = ButtonFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 0),
-                Size = UDim2.new(1, -60, 1, 0),
-                Font = Enum.Font.GothamMedium,
+                Position = UDim2.new(0, 14, 0, Props.Description and 6 or 0),
+                Size = UDim2.new(1, -60, 0, Props.Description and 20 or height),
+                Font = Enum.Font.GothamSemibold,
                 Text = Props.Name,
                 TextColor3 = Genim.Theme.TextColor,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left
             })
 
+            if Props.Description then
+                Create("TextLabel", {
+                    Parent = ButtonFrame,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 14, 0, 26),
+                    Size = UDim2.new(1, -60, 0, 16),
+                    Font = Enum.Font.GothamMedium,
+                    Text = Props.Description,
+                    TextColor3 = Genim.Theme.SecondaryTextColor,
+                    TextSize = 11,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextTransparency = 0.2
+                })
+            end
+
+            -- Arrow icon
+            local ArrowIcon = Create("TextLabel", {
+                Parent = ButtonFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(1, -35, 0.5, -8),
+                Size = UDim2.new(0, 16, 0, 16),
+                Font = Enum.Font.GothamBold,
+                Text = "→",
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 16,
+                TextTransparency = 0.3
+            })
+
+            local Button = Create("TextButton", {
+                Parent = ButtonFrame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = "",
+                AutoButtonColor = false
+            })
+
+            Button.MouseEnter:Connect(function()
+                Tween(ButtonFrame, 0.2, {BackgroundTransparency = 0})
+                Tween(bStroke, 0.2, {Color = Genim.Theme.AccentColor, Transparency = 0.5})
+                Tween(ArrowIcon, 0.2, {TextTransparency = 0, TextColor3 = Genim.Theme.AccentColor, Position = UDim2.new(1, -32, 0.5, -8)})
+            end)
+            
+            Button.MouseLeave:Connect(function()
+                Tween(ButtonFrame, 0.2, {BackgroundTransparency = 0.1})
+                Tween(bStroke, 0.2, {Color = Genim.Theme.StrokeColor, Transparency = 0.2})
+                Tween(ArrowIcon, 0.2, {TextTransparency = 0.3, TextColor3 = Genim.Theme.SecondaryTextColor, Position = UDim2.new(1, -35, 0.5, -8)})
+            end)
+            
+            Button.MouseButton1Click:Connect(function()
+                Ripple(ButtonFrame, Genim.Theme.AccentColor)
+                -- Click feedback
+                Tween(ButtonFrame, 0.05, {Size = UDim2.new(0.91, 0, 0, height - 2)})
+                task.wait(0.05)
+                Tween(ButtonFrame, 0.15, {Size = UDim2.new(0.93, 0, 0, height)})
+                Props.Callback()
+            end)
+
+            return {
+                Set = function(_, NewName)
+                    ButtonFrame:FindFirstChildOfClass("TextLabel").Text = NewName
+                end
+            }
+        end
+
+        -- ═══════════════════════════════════════════════════════
+        -- TOGGLE (Enhanced)
+        -- ═══════════════════════════════════════════════════════
+        function Tab:CreateToggle(Props)
+            Props = Props or {}
+            Props.Name = Props.Name or "Toggle"
+            Props.CurrentValue = Props.CurrentValue or false
+            Props.Callback = Props.Callback or function() end
+            Props.Description = Props.Description or nil
+            local Toggled = Props.CurrentValue
+
+            local height = Props.Description and 52 or 42
+
+            local ToggleFrame = Create("Frame", {
+                Name = Props.Name .. "Toggle",
+                Parent = TabScroll,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
+                BorderSizePixel = 0,
+                Size = UDim2.new(0.93, 0, 0, height),
+                ClipsDescendants = true
+            })
+            
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = ToggleFrame })
+            local tStroke = Create("UIStroke", {
+                Color = Genim.Theme.StrokeColor,
+                Thickness = 1,
+                Transparency = 0.2,
+                Parent = ToggleFrame
+            })
+
+            Create("TextLabel", {
+                Parent = ToggleFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 14, 0, Props.Description and 6 or 0),
+                Size = UDim2.new(1, -70, 0, Props.Description and 20 or height),
+                Font = Enum.Font.GothamSemibold,
+                Text = Props.Name,
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            if Props.Description then
+                Create("TextLabel", {
+                    Parent = ToggleFrame,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 14, 0, 26),
+                    Size = UDim2.new(1, -70, 0, 16),
+                    Font = Enum.Font.GothamMedium,
+                    Text = Props.Description,
+                    TextColor3 = Genim.Theme.SecondaryTextColor,
+                    TextSize = 11,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextTransparency = 0.2
+                })
+            end
+
             local OuterToggle = Create("Frame", {
                 Name = "Outer",
                 Parent = ToggleFrame,
-                BackgroundColor3 = Color3.fromRGB(30, 41, 59),
-                Position = UDim2.new(1, -45, 0.5, -9),
-                Size = UDim2.new(0, 32, 0, 18)
+                BackgroundColor3 = Color3.fromRGB(30, 35, 55),
+                Position = UDim2.new(1, -52, 0.5, -10),
+                Size = UDim2.new(0, 38, 0, 20)
             })
-            
-            Create("UICorner", {
-                CornerRadius = UDim.new(1, 0),
-                Parent = OuterToggle
-            })
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = OuterToggle })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Transparency = 0.5, Parent = OuterToggle })
 
             local InnerToggle = Create("Frame", {
                 Name = "Inner",
                 Parent = OuterToggle,
-                BackgroundColor3 = Genim.Theme.TextColor,
-                Position = Toggled and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7),
-                Size = UDim2.new(0, 14, 0, 14)
+                BackgroundColor3 = Genim.Theme.SecondaryTextColor,
+                Position = Toggled and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8),
+                Size = UDim2.new(0, 16, 0, 16)
             })
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = InnerToggle })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(1, 0),
-                Parent = InnerToggle
+            -- Glow inside the toggle dot when active
+            local InnerGlow = Create("Frame", {
+                Name = "Glow",
+                Parent = InnerToggle,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundTransparency = Toggled and 0.5 or 1,
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Size = UDim2.new(0, 8, 0, 8)
             })
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = InnerGlow })
 
             local Button = Create("TextButton", {
                 Parent = ToggleFrame,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
-                Text = ""
+                Text = "",
+                AutoButtonColor = false
             })
 
-            local function Update(Save)
+            local function Update()
                 if Toggled then
-                    Tween(OuterToggle, 0.2, {BackgroundColor3 = Genim.Theme.AccentColor})
-                    Tween(InnerToggle, 0.2, {Position = UDim2.new(1, -16, 0.5, -7)})
+                    Tween(OuterToggle, 0.25, {BackgroundColor3 = Genim.Theme.AccentColor})
+                    TweenBounce(InnerToggle, 0.3, {Position = UDim2.new(1, -18, 0.5, -8), BackgroundColor3 = Color3.new(1, 1, 1)})
+                    Tween(InnerGlow, 0.25, {BackgroundTransparency = 0.5})
+                    Tween(tStroke, 0.25, {Color = Genim.Theme.AccentColor, Transparency = 0.6})
                 else
-                    Tween(OuterToggle, 0.2, {BackgroundColor3 = Color3.fromRGB(30, 41, 59)})
-                    Tween(InnerToggle, 0.2, {Position = UDim2.new(0, 2, 0.5, -7)})
+                    Tween(OuterToggle, 0.25, {BackgroundColor3 = Color3.fromRGB(30, 35, 55)})
+                    Tween(InnerToggle, 0.25, {Position = UDim2.new(0, 2, 0.5, -8), BackgroundColor3 = Genim.Theme.SecondaryTextColor})
+                    Tween(InnerGlow, 0.25, {BackgroundTransparency = 1})
+                    Tween(tStroke, 0.25, {Color = Genim.Theme.StrokeColor, Transparency = 0.2})
                 end
-                
                 Props.Callback(Toggled)
             end
 
-            Button.MouseButton1Click:Connect(function()
-                Ripple(ToggleFrame)
-                Toggled = not Toggled
-                Update(true)
+            Button.MouseEnter:Connect(function()
+                Tween(ToggleFrame, 0.2, {BackgroundTransparency = 0})
+            end)
+            Button.MouseLeave:Connect(function()
+                Tween(ToggleFrame, 0.2, {BackgroundTransparency = 0.1})
             end)
 
+            Button.MouseButton1Click:Connect(function()
+                Toggled = not Toggled
+                Update()
+            end)
 
-            if Toggled then Update(false) end
+            if Toggled then Update() end
 
             return {
                 Set = function(_, NewValue)
                     Toggled = NewValue
-                    Update(true)
+                    Update()
+                end,
+                Get = function()
+                    return Toggled
                 end
             }
         end
 
+        -- ═══════════════════════════════════════════════════════
+        -- SLIDER (Enhanced)
+        -- ═══════════════════════════════════════════════════════
         function Tab:CreateSlider(Props)
             Props = Props or {}
             Props.Name = Props.Name or "Slider"
             Props.Min = Props.Min or 0
             Props.Max = Props.Max or 100
             Props.CurrentValue = Props.CurrentValue or 50
+            Props.Increment = Props.Increment or 1
+            Props.Suffix = Props.Suffix or ""
             Props.Callback = Props.Callback or function() end
             local Value = Props.CurrentValue
 
             local SliderFrame = Create("Frame", {
                 Name = Props.Name .. "Slider",
                 Parent = TabScroll,
-                BackgroundColor3 = Genim.Theme.DarkerColor,
-                BackgroundTransparency = 0.2,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 52)
+                Size = UDim2.new(0.93, 0, 0, 56)
             })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = SliderFrame
-            })
-            
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = SliderFrame })
             Create("UIStroke", {
                 Color = Genim.Theme.StrokeColor,
                 Thickness = 1,
+                Transparency = 0.2,
                 Parent = SliderFrame
             })
 
-            local Title = Create("TextLabel", {
+            Create("TextLabel", {
                 Parent = SliderFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 8),
-                Size = UDim2.new(1, -60, 0, 15),
-                Font = Enum.Font.GothamMedium,
+                Position = UDim2.new(0, 14, 0, 8),
+                Size = UDim2.new(1, -80, 0, 18),
+                Font = Enum.Font.GothamSemibold,
                 Text = Props.Name,
                 TextColor3 = Genim.Theme.TextColor,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left
             })
 
-            local ValueLabel = Create("TextLabel", {
+            -- Value badge
+            local ValueBadge = Create("Frame", {
                 Parent = SliderFrame,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundTransparency = 0.85,
+                Position = UDim2.new(1, -70, 0, 7),
+                Size = UDim2.new(0, 58, 0, 20)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = ValueBadge })
+
+            local ValueLabel = Create("TextLabel", {
+                Parent = ValueBadge,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -60, 0, 8),
-                Size = UDim2.new(0, 50, 0, 15),
-                Font = Enum.Font.GothamSemibold,
-                Text = tostring(Value),
-                TextColor3 = Genim.Theme.SecondaryTextColor,
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Right
+                Size = UDim2.new(1, 0, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = tostring(Value) .. Props.Suffix,
+                TextColor3 = Genim.Theme.AccentColor,
+                TextSize = 11
             })
 
             local SliderTrack = Create("Frame", {
                 Name = "Track",
                 Parent = SliderFrame,
-                BackgroundColor3 = Color3.fromRGB(30, 41, 59),
-                Position = UDim2.new(0, 12, 1, -12),
-                Size = UDim2.new(1, -24, 0, 4)
+                BackgroundColor3 = Color3.fromRGB(25, 30, 48),
+                Position = UDim2.new(0, 14, 1, -16),
+                Size = UDim2.new(1, -28, 0, 6)
             })
-            
-            Create("UICorner", {
-                CornerRadius = UDim.new(1, 0),
-                Parent = SliderTrack
-            })
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderTrack })
 
             local SliderFill = Create("Frame", {
                 Name = "Fill",
                 Parent = SliderTrack,
-                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundColor3 = Color3.new(1, 1, 1),
                 Size = UDim2.new((Value - Props.Min) / (Props.Max - Props.Min), 0, 1, 0)
             })
-            
-            Create("UICorner", {
-                CornerRadius = UDim.new(1, 0),
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderFill })
+            local fillGrad = Create("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                }),
                 Parent = SliderFill
             })
 
+            -- Slider dot with glow
             local SliderDot = Create("Frame", {
                 Name = "Dot",
                 Parent = SliderFill,
-                BackgroundColor3 = Genim.Theme.TextColor,
-                Position = UDim2.new(1, -6, 0.5, -6),
-                Size = UDim2.new(0, 12, 0, 12)
+                BackgroundColor3 = Color3.new(1, 1, 1),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(1, 0, 0.5, 0),
+                Size = UDim2.new(0, 14, 0, 14)
             })
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderDot })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(1, 0),
-                Parent = SliderDot
+            local DotGlow = Create("Frame", {
+                Parent = SliderDot,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundTransparency = 0.7,
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                Size = UDim2.new(0, 22, 0, 22)
             })
-            
-            Create("UIStroke", {
-                Color = Genim.Theme.AccentColor,
-                Thickness = 2,
-                Parent = SliderDot
-            })
+            Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = DotGlow })
 
-            local function Update(Input, Save)
+            local function Update(Input)
                 local Percentage
                 if typeof(Input) == "number" then
                     Percentage = Input
@@ -977,92 +1536,121 @@ function Genim:CreateWindow(Config)
                     Percentage = math.clamp((Input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X, 0, 1)
                 end
                 
-                Value = math.floor(Props.Min + (Props.Max - Props.Min) * Percentage)
+                -- Snap to increment
+                local rawValue = Props.Min + (Props.Max - Props.Min) * Percentage
+                Value = math.floor(rawValue / Props.Increment + 0.5) * Props.Increment
+                Value = math.clamp(Value, Props.Min, Props.Max)
+                Percentage = (Value - Props.Min) / (Props.Max - Props.Min)
                 
-                ValueLabel.Text = tostring(Value)
-                Tween(SliderFill, 0.1, {Size = UDim2.new(Percentage, 0, 1, 0)})
+                ValueLabel.Text = tostring(Value) .. Props.Suffix
+                Tween(SliderFill, 0.08, {Size = UDim2.new(Percentage, 0, 1, 0)})
                 
                 Props.Callback(Value)
             end
 
             local Dragging = false
+            
             SliderFrame.InputBegan:Connect(function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                     Dragging = true
-                    Update(Input, true)
+                    Tween(SliderDot, 0.15, {Size = UDim2.new(0, 18, 0, 18)})
+                    Tween(DotGlow, 0.15, {BackgroundTransparency = 0.5, Size = UDim2.new(0, 28, 0, 28)})
+                    Update(Input)
                 end
             end)
 
             UserInputService.InputEnded:Connect(function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                     Dragging = false
+                    Tween(SliderDot, 0.15, {Size = UDim2.new(0, 14, 0, 14)})
+                    Tween(DotGlow, 0.15, {BackgroundTransparency = 0.7, Size = UDim2.new(0, 22, 0, 22)})
                 end
             end)
 
             UserInputService.InputChanged:Connect(function(Input)
                 if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
-                    Update(Input, true)
+                    Update(Input)
                 end
             end)
 
-            if Value ~= Props.CurrentValue then
-                task.spawn(function()
-                    task.wait()
-                    Update((Value - Props.Min) / (Props.Max - Props.Min), false)
-                end)
-            end
+            -- Initialize
+            task.spawn(function()
+                task.wait()
+                Update((Value - Props.Min) / (Props.Max - Props.Min))
+            end)
 
             return {
                 Set = function(_, NewValue)
                     Value = math.clamp(NewValue, Props.Min, Props.Max)
-                    Update((Value - Props.Min) / (Props.Max - Props.Min), true)
+                    Update((Value - Props.Min) / (Props.Max - Props.Min))
+                end,
+                Get = function()
+                    return Value
                 end
             }
         end
 
+        -- ═══════════════════════════════════════════════════════
+        -- INPUT (Enhanced)
+        -- ═══════════════════════════════════════════════════════
         function Tab:CreateInput(Props)
             Props = Props or {}
             Props.Name = Props.Name or "Input"
             Props.Placeholder = Props.Placeholder or "Type here..."
             Props.Callback = Props.Callback or function() end
+            Props.Description = Props.Description or nil
+
+            local height = Props.Description and 52 or 42
 
             local InputFrame = Create("Frame", {
                 Name = Props.Name .. "Input",
                 Parent = TabScroll,
-                BackgroundColor3 = Genim.Theme.DarkerColor,
-                BackgroundTransparency = 0.2,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 40)
+                Size = UDim2.new(0.93, 0, 0, height)
             })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = InputFrame
-            })
-            
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = InputFrame })
             Create("UIStroke", {
                 Color = Genim.Theme.StrokeColor,
                 Thickness = 1,
+                Transparency = 0.2,
                 Parent = InputFrame
             })
 
-            local Title = Create("TextLabel", {
+            Create("TextLabel", {
                 Parent = InputFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 0),
-                Size = UDim2.new(0.4, 0, 1, 0),
-                Font = Enum.Font.GothamMedium,
+                Position = UDim2.new(0, 14, 0, Props.Description and 4 or 0),
+                Size = UDim2.new(0.4, 0, 0, Props.Description and 22 or height),
+                Font = Enum.Font.GothamSemibold,
                 Text = Props.Name,
                 TextColor3 = Genim.Theme.TextColor,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left
             })
 
+            if Props.Description then
+                Create("TextLabel", {
+                    Parent = InputFrame,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 14, 0, 24),
+                    Size = UDim2.new(0.4, 0, 0, 16),
+                    Font = Enum.Font.GothamMedium,
+                    Text = Props.Description,
+                    TextColor3 = Genim.Theme.SecondaryTextColor,
+                    TextSize = 11,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextTransparency = 0.2
+                })
+            end
+
             local InputBox = Create("TextBox", {
                 Parent = InputFrame,
-                BackgroundColor3 = Color3.fromRGB(15, 23, 42),
-                Position = UDim2.new(1, -160, 0.5, -11),
-                Size = UDim2.new(0, 150, 0, 22),
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                Position = UDim2.new(1, -175, 0.5, -13),
+                Size = UDim2.new(0, 160, 0, 26),
                 Font = Enum.Font.GothamMedium,
                 PlaceholderText = Props.Placeholder,
                 Text = "",
@@ -1071,30 +1659,43 @@ function Genim:CreateWindow(Config)
                 TextSize = 12,
                 ClearTextOnFocus = false
             })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = InputBox })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 4),
-                Parent = InputBox
-            })
-            
-            Create("UIStroke", {
+            local inputStroke = Create("UIStroke", {
                 Color = Genim.Theme.StrokeColor,
                 Thickness = 1,
+                Transparency = 0.2,
                 Parent = InputBox
             })
+            Create("UIPadding", {
+                Parent = InputBox,
+                PaddingLeft = UDim.new(0, 8),
+                PaddingRight = UDim.new(0, 8)
+            })
+
+            InputBox.Focused:Connect(function()
+                Tween(inputStroke, 0.2, {Color = Genim.Theme.AccentColor, Transparency = 0})
+            end)
 
             InputBox.FocusLost:Connect(function(EnterPressed)
+                Tween(inputStroke, 0.2, {Color = Genim.Theme.StrokeColor, Transparency = 0.2})
                 Props.Callback(InputBox.Text, EnterPressed)
             end)
 
             return {
                 Set = function(_, NewValue)
                     InputBox.Text = NewValue
-                    Props.Callback(NewValue)
+                    Props.Callback(NewValue, false)
+                end,
+                Get = function()
+                    return InputBox.Text
                 end
             }
         end
 
+        -- ═══════════════════════════════════════════════════════
+        -- DROPDOWN (Enhanced)
+        -- ═══════════════════════════════════════════════════════
         function Tab:CreateDropdown(Props)
             Props = Props or {}
             Props.Name = Props.Name or "Dropdown"
@@ -1107,69 +1708,89 @@ function Genim:CreateWindow(Config)
             local DropdownFrame = Create("Frame", {
                 Name = Props.Name .. "Dropdown",
                 Parent = TabScroll,
-                BackgroundColor3 = Genim.Theme.DarkerColor,
-                BackgroundTransparency = 0.2,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
                 BorderSizePixel = 0,
-                Size = UDim2.new(0.92, 0, 0, 40),
+                Size = UDim2.new(0.93, 0, 0, 42),
                 ClipsDescendants = true
             })
             
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = DropdownFrame
-            })
-            
-            Create("UIStroke", {
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = DropdownFrame })
+            local ddStroke = Create("UIStroke", {
                 Color = Genim.Theme.StrokeColor,
                 Thickness = 1,
+                Transparency = 0.2,
                 Parent = DropdownFrame
             })
 
-            local Title = Create("TextLabel", {
+            Create("TextLabel", {
                 Parent = DropdownFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 0),
-                Size = UDim2.new(1, -60, 0, 38),
-                Font = Enum.Font.GothamMedium,
+                Position = UDim2.new(0, 14, 0, 0),
+                Size = UDim2.new(1, -130, 0, 42),
+                Font = Enum.Font.GothamSemibold,
                 Text = Props.Name,
                 TextColor3 = Genim.Theme.TextColor,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left
             })
 
-            local SelectedLabel = Create("TextLabel", {
+            -- Selected value badge
+            local SelectedBadge = Create("Frame", {
                 Parent = DropdownFrame,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundTransparency = 0.85,
+                Position = UDim2.new(1, -130, 0, 10),
+                Size = UDim2.new(0, 90, 0, 22)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = SelectedBadge })
+
+            local SelectedLabel = Create("TextLabel", {
+                Parent = SelectedBadge,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -160, 0, 0),
-                Size = UDim2.new(0, 120, 0, 38),
-                Font = Enum.Font.GothamSemibold,
+                Size = UDim2.new(1, 0, 1, 0),
+                Font = Enum.Font.GothamBold,
                 Text = Selected,
                 TextColor3 = Genim.Theme.AccentColor,
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Right
+                TextSize = 11,
+                TextTruncate = Enum.TextTruncate.AtEnd
             })
 
-            local Arrow = Create("ImageLabel", {
+            -- Animated arrow
+            local Arrow = Create("TextLabel", {
                 Parent = DropdownFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -30, 0, 10),
+                Position = UDim2.new(1, -32, 0, 12),
                 Size = UDim2.new(0, 18, 0, 18),
-                Image = "rbxassetid://15132379512",
-                Rotation = 90,
-                ImageColor3 = Genim.Theme.SecondaryTextColor
+                Font = Enum.Font.GothamBold,
+                Text = "▼",
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 10,
+                Rotation = 0
+            })
+
+            -- Items container with separator
+            Create("Frame", {
+                Name = "ItemSep",
+                Parent = DropdownFrame,
+                BackgroundColor3 = Genim.Theme.StrokeColor,
+                BackgroundTransparency = 0.4,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 14, 0, 42),
+                Size = UDim2.new(1, -28, 0, 1)
             })
 
             local ItemsContainer = Create("Frame", {
                 Name = "Items",
                 Parent = DropdownFrame,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 0, 0, 38),
+                Position = UDim2.new(0, 0, 0, 46),
                 Size = UDim2.new(1, 0, 0, 0)
             })
             
             Create("UIListLayout", {
                 Parent = ItemsContainer,
-                Padding = UDim.new(0, 2),
+                Padding = UDim.new(0, 3),
                 SortOrder = Enum.SortOrder.LayoutOrder
             })
             
@@ -1177,31 +1798,45 @@ function Genim:CreateWindow(Config)
                 Parent = ItemsContainer,
                 PaddingLeft = UDim.new(0, 10),
                 PaddingRight = UDim.new(0, 10),
-                PaddingBottom = UDim.new(0, 5)
+                PaddingBottom = UDim.new(0, 6)
             })
 
             local function Toggle(State)
                 Opened = State
-                Tween(Arrow, 0.2, {Rotation = Opened and 270 or 90})
+                Tween(Arrow, 0.25, {Rotation = Opened and 180 or 0})
+                Tween(ddStroke, 0.2, {Color = Opened and Genim.Theme.AccentColor or Genim.Theme.StrokeColor})
                 
-                local ContentSize = 40
+                local ContentSize = 42
                 if Opened then
-                    for _, option in pairs(Props.Options) do
-                        ContentSize = ContentSize + 28
+                    ContentSize = ContentSize + 8
+                    for _, _ in pairs(Props.Options) do
+                        ContentSize = ContentSize + 31
                     end
-                    ContentSize = ContentSize + 5
+                    ContentSize = ContentSize + 6
                 end
                 
-                Tween(DropdownFrame, 0.3, {Size = UDim2.new(0.92, 0, 0, ContentSize)})
+                Tween(DropdownFrame, 0.35, {Size = UDim2.new(0.93, 0, 0, ContentSize)})
             end
 
-            local function Update(Value, Save)
+            local function UpdateSelection(Value)
                 Selected = Value
                 SelectedLabel.Text = Selected
                 
                 for _, child in pairs(ItemsContainer:GetChildren()) do
-                    if child:IsA("TextButton") then
-                        child.TextColor3 = (child.Name == Selected and Genim.Theme.TextColor or Genim.Theme.SecondaryTextColor)
+                    if child:IsA("Frame") and child:FindFirstChild("Btn") then
+                        local isSelected = child.Name == Selected
+                        Tween(child, 0.15, {
+                            BackgroundColor3 = isSelected and Genim.Theme.AccentColor or Genim.Theme.DarkerColor,
+                            BackgroundTransparency = isSelected and 0.8 or 0.2
+                        })
+                        local btnLabel = child:FindFirstChild("BtnLabel")
+                        if btnLabel then
+                            Tween(btnLabel, 0.15, {TextColor3 = isSelected and Genim.Theme.AccentColor or Genim.Theme.SecondaryTextColor})
+                        end
+                        local check = child:FindFirstChild("Check")
+                        if check then
+                            check.Visible = isSelected
+                        end
                     end
                 end
                 
@@ -1209,26 +1844,66 @@ function Genim:CreateWindow(Config)
             end
 
             local function AddOption(Value)
-                local btn = Create("TextButton", {
+                local optFrame = Create("Frame", {
                     Name = Value,
                     Parent = ItemsContainer,
-                    BackgroundColor3 = Color3.fromRGB(15, 23, 42),
+                    BackgroundColor3 = (Value == Selected) and Genim.Theme.AccentColor or Genim.Theme.DarkerColor,
+                    BackgroundTransparency = (Value == Selected) and 0.8 or 0.2,
                     BorderSizePixel = 0,
-                    Size = UDim2.new(1, 0, 0, 26),
+                    Size = UDim2.new(1, 0, 0, 28)
+                })
+                Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = optFrame })
+
+                local btnLabel = Create("TextLabel", {
+                    Name = "BtnLabel",
+                    Parent = optFrame,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 10, 0, 0),
+                    Size = UDim2.new(1, -30, 1, 0),
                     Font = Enum.Font.GothamMedium,
                     Text = Value,
-                    TextColor3 = (Value == Selected and Genim.Theme.TextColor or Genim.Theme.SecondaryTextColor),
+                    TextColor3 = (Value == Selected) and Genim.Theme.AccentColor or Genim.Theme.SecondaryTextColor,
                     TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+
+                local check = Create("TextLabel", {
+                    Name = "Check",
+                    Parent = optFrame,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(1, -24, 0, 0),
+                    Size = UDim2.new(0, 18, 1, 0),
+                    Font = Enum.Font.GothamBold,
+                    Text = "✓",
+                    TextColor3 = Genim.Theme.AccentColor,
+                    TextSize = 12,
+                    Visible = (Value == Selected)
+                })
+
+                local btn = Create("TextButton", {
+                    Name = "Btn",
+                    Parent = optFrame,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 1, 0),
+                    Text = "",
                     AutoButtonColor = false
                 })
-                
-                Create("UICorner", {
-                    CornerRadius = UDim.new(0, 4),
-                    Parent = btn
-                })
+
+                btn.MouseEnter:Connect(function()
+                    if optFrame.Name ~= Selected then
+                        Tween(optFrame, 0.15, {BackgroundTransparency = 0.1})
+                    end
+                end)
+                btn.MouseLeave:Connect(function()
+                    if optFrame.Name ~= Selected then
+                        Tween(optFrame, 0.15, {BackgroundTransparency = 0.2})
+                    end
+                end)
                 
                 btn.MouseButton1Click:Connect(function()
-                    Update(Value, true)
+                    Ripple(optFrame, Genim.Theme.AccentColor)
+                    UpdateSelection(Value)
+                    task.wait(0.1)
                     Toggle(false)
                 end)
             end
@@ -1237,70 +1912,259 @@ function Genim:CreateWindow(Config)
                 AddOption(opt)
             end
 
-            local Button = Create("TextButton", {
+            local MainButton = Create("TextButton", {
                 Parent = DropdownFrame,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 0, 38),
-                Text = ""
+                Size = UDim2.new(1, 0, 0, 42),
+                Text = "",
+                AutoButtonColor = false
             })
 
-            Button.MouseButton1Click:Connect(function()
+            MainButton.MouseButton1Click:Connect(function()
                 Toggle(not Opened)
             end)
 
-            if Selected ~= Props.CurrentOption then
-                task.spawn(function()
-                    task.wait()
-                    Update(Selected, false)
-                end)
-            end
-
             return {
                 Set = function(_, NewValue)
-                    Update(NewValue, true)
+                    UpdateSelection(NewValue)
+                end,
+                Get = function()
+                    return Selected
                 end,
                 Refresh = function(_, NewOptions, ClearOld)
                     if ClearOld then
                         for _, child in pairs(ItemsContainer:GetChildren()) do
-                            if child:IsA("TextButton") then child:Destroy() end
+                            if child:IsA("Frame") then child:Destroy() end
                         end
                     end
                     Props.Options = NewOptions
                     for _, opt in pairs(NewOptions) do
                         AddOption(opt)
                     end
+                    if Opened then
+                        Toggle(false)
+                        task.wait(0.1)
+                        Toggle(true)
+                    end
                 end
             }
         end
 
+        -- ═══════════════════════════════════════════════════════
+        -- COLOR PICKER
+        -- ═══════════════════════════════════════════════════════
+        function Tab:CreateColorPicker(Props)
+            Props = Props or {}
+            Props.Name = Props.Name or "Color Picker"
+            Props.Default = Props.Default or Color3.fromRGB(99, 102, 241)
+            Props.Callback = Props.Callback or function() end
+            local CurrentColor = Props.Default
 
+            local PickerFrame = Create("Frame", {
+                Name = Props.Name .. "ColorPicker",
+                Parent = TabScroll,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
+                BorderSizePixel = 0,
+                Size = UDim2.new(0.93, 0, 0, 42)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = PickerFrame })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Transparency = 0.2, Parent = PickerFrame })
+
+            Create("TextLabel", {
+                Parent = PickerFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 14, 0, 0),
+                Size = UDim2.new(1, -60, 1, 0),
+                Font = Enum.Font.GothamSemibold,
+                Text = Props.Name,
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local ColorPreview = Create("Frame", {
+                Parent = PickerFrame,
+                BackgroundColor3 = CurrentColor,
+                Position = UDim2.new(1, -42, 0.5, -11),
+                Size = UDim2.new(0, 28, 0, 22)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = ColorPreview })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = ColorPreview })
+
+            local PreviewBtn = Create("TextButton", {
+                Parent = PickerFrame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = "",
+                AutoButtonColor = false
+            })
+
+            PreviewBtn.MouseButton1Click:Connect(function()
+                -- Simple color cycle for now (can be expanded)
+                local h, s, v = CurrentColor:ToHSV()
+                h = (h + 0.05) % 1
+                CurrentColor = Color3.fromHSV(h, s, v)
+                Tween(ColorPreview, 0.2, {BackgroundColor3 = CurrentColor})
+                Props.Callback(CurrentColor)
+            end)
+
+            return {
+                Set = function(_, NewColor)
+                    CurrentColor = NewColor
+                    Tween(ColorPreview, 0.2, {BackgroundColor3 = CurrentColor})
+                    Props.Callback(CurrentColor)
+                end,
+                Get = function()
+                    return CurrentColor
+                end
+            }
+        end
+
+        -- ═══════════════════════════════════════════════════════
+        -- KEYBIND
+        -- ═══════════════════════════════════════════════════════
+        function Tab:CreateKeybind(Props)
+            Props = Props or {}
+            Props.Name = Props.Name or "Keybind"
+            Props.CurrentKeybind = Props.CurrentKeybind or "E"
+            Props.Callback = Props.Callback or function() end
+            local CurrentKey = Props.CurrentKeybind
+            local Listening = false
+
+            local KeybindFrame = Create("Frame", {
+                Name = Props.Name .. "Keybind",
+                Parent = TabScroll,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 0.1,
+                BorderSizePixel = 0,
+                Size = UDim2.new(0.93, 0, 0, 42)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = KeybindFrame })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Transparency = 0.2, Parent = KeybindFrame })
+
+            Create("TextLabel", {
+                Parent = KeybindFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 14, 0, 0),
+                Size = UDim2.new(1, -80, 1, 0),
+                Font = Enum.Font.GothamSemibold,
+                Text = Props.Name,
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local KeyBadge = Create("Frame", {
+                Parent = KeybindFrame,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                Position = UDim2.new(1, -68, 0.5, -12),
+                Size = UDim2.new(0, 54, 0, 24)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = KeyBadge })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KeyBadge })
+
+            local KeyLabel = Create("TextLabel", {
+                Parent = KeyBadge,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = CurrentKey,
+                TextColor3 = Genim.Theme.AccentColor,
+                TextSize = 11
+            })
+
+            local KeyBtn = Create("TextButton", {
+                Parent = KeybindFrame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = "",
+                AutoButtonColor = false
+            })
+
+            KeyBtn.MouseButton1Click:Connect(function()
+                Listening = true
+                KeyLabel.Text = "..."
+                Tween(KeyBadge, 0.2, {BackgroundColor3 = Genim.Theme.AccentColor})
+                Tween(KeyLabel, 0.2, {TextColor3 = Color3.new(1, 1, 1)})
+            end)
+
+            UserInputService.InputBegan:Connect(function(input, gpe)
+                if gpe then return end
+                if Listening and input.UserInputType == Enum.UserInputType.Keyboard then
+                    CurrentKey = input.KeyCode.Name
+                    KeyLabel.Text = CurrentKey
+                    Listening = false
+                    Tween(KeyBadge, 0.2, {BackgroundColor3 = Genim.Theme.DarkerColor})
+                    Tween(KeyLabel, 0.2, {TextColor3 = Genim.Theme.AccentColor})
+                    Props.Callback(CurrentKey)
+                end
+            end)
+
+            return {
+                Set = function(_, NewKey)
+                    CurrentKey = NewKey
+                    KeyLabel.Text = CurrentKey
+                end,
+                Get = function()
+                    return CurrentKey
+                end
+            }
+        end
+
+        -- ═══════════════════════════════════════════════════════
+        -- TAB SELECTION
+        -- ═══════════════════════════════════════════════════════
         function Tab:Select()
-            -- Guard: if this tab is already active, do nothing
             if Window.CurrentTab and Window.CurrentTab.Content == TabContent then
                 return
             end
 
-            -- Hide old tab content IMMEDIATELY to avoid overlap ghost
             if Window.CurrentTab then
                 local OldContent = Window.CurrentTab.Content
                 local OldBtn = Window.CurrentTab.Button
-                -- Instantly hide and reset old content
+                local OldLabel = OldBtn:FindFirstChild("Label")
+                local OldIconFrame = OldBtn:FindFirstChild("IconFrame")
+                
                 OldContent.Visible = false
                 OldContent.GroupTransparency = 0
                 OldContent.Position = UDim2.new(0, 0, 0, 0)
-                -- Deactivate old button
-                Tween(OldBtn, 0.2, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
+                
+                Tween(OldBtn, 0.25, {BackgroundTransparency = 1})
+                if OldLabel then Tween(OldLabel, 0.25, {TextColor3 = Genim.Theme.SecondaryTextColor}) end
+                if OldIconFrame then
+                    Tween(OldIconFrame, 0.25, {BackgroundTransparency = 0.9})
+                    local iconLabel = OldIconFrame:FindFirstChildOfClass("TextLabel")
+                    if iconLabel then Tween(iconLabel, 0.25, {TextColor3 = Genim.Theme.AccentColor}) end
+                end
+                
                 local OldInd = OldBtn:FindFirstChild("Indicator")
-                if OldInd then OldInd.Visible = false end
+                if OldInd then
+                    Tween(OldInd, 0.2, {Size = UDim2.new(0, 0, 0.7, 0)})
+                    task.delay(0.2, function() OldInd.Visible = false end)
+                end
             end
 
-            -- Animate new tab content in
+            -- Animate new tab in
             TabContent.Visible = true
-            TabContent.Position = UDim2.new(0, 0, 0, 10)
+            TabContent.Position = UDim2.new(0.02, 0, 0, 8)
             TabContent.GroupTransparency = 1
-            Tween(TabContent, 0.3, {Position = UDim2.new(0, 0, 0, 0), GroupTransparency = 0})
-            Tween(TabButton, 0.2, {BackgroundTransparency = 0.85, TextColor3 = Genim.Theme.TextColor})
+            Tween(TabContent, 0.35, {Position = UDim2.new(0, 0, 0, 0), GroupTransparency = 0})
+            
+            Tween(TabButton, 0.25, {BackgroundTransparency = 0.85})
+            
+            local tabLabel = TabButton:FindFirstChild("Label")
+            if tabLabel then Tween(tabLabel, 0.25, {TextColor3 = Genim.Theme.TextColor}) end
+            
+            local iconFrame = TabButton:FindFirstChild("IconFrame")
+            if iconFrame then
+                Tween(iconFrame, 0.25, {BackgroundTransparency = 0.75})
+            end
+            
             TabIndicator.Visible = true
+            TabIndicator.Size = UDim2.new(0, 0, 0.7, 0)
+            TweenBounce(TabIndicator, 0.3, {Size = UDim2.new(0, 3, 0.7, 0)})
+            
             Window.CurrentTab = {Button = TabButton, Content = TabContent}
         end
         
@@ -1315,7 +2179,9 @@ function Genim:CreateWindow(Config)
         return Tab
     end
     
-    -- Loading Screen Implementation
+    -- ═══════════════════════════════════════════════════════
+    -- LOADING SCREEN
+    -- ═══════════════════════════════════════════════════════
     local LoadingFrame = Create("Frame", {
         Name = "LoadingFrame",
         Parent = MainFrame,
@@ -1324,21 +2190,72 @@ function Genim:CreateWindow(Config)
         Size = UDim2.new(1, 0, 1, 0),
         ZIndex = 100
     })
-    
-    Create("UICorner", {
-        CornerRadius = UDim.new(0, 10),
+    Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = LoadingFrame })
+
+    -- Subtle background gradient
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.MainColor),
+            ColorSequenceKeypoint.new(0.5, Color3.new(
+                math.min(Genim.Theme.MainColor.R * 1.15, 1),
+                math.min(Genim.Theme.MainColor.G * 1.15, 1),
+                math.min(Genim.Theme.MainColor.B * 1.15, 1)
+            )),
+            ColorSequenceKeypoint.new(1, Genim.Theme.MainColor)
+        }),
+        Rotation = 45,
         Parent = LoadingFrame
     })
+
+    -- Animated logo in loading
+    local LoadingLogo = Create("Frame", {
+        Parent = LoadingFrame,
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.35, 0),
+        Size = UDim2.new(0, 50, 0, 50),
+        ZIndex = 101
+    })
+    Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = LoadingLogo })
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+        }),
+        Rotation = 45,
+        Parent = LoadingLogo
+    })
+    
+    local LoadingLogoText = Create("TextLabel", {
+        Parent = LoadingLogo,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, 0),
+        Font = Enum.Font.GothamBlack,
+        Text = string.sub(Config.Name, 1, 1):upper(),
+        TextColor3 = Color3.new(1, 1, 1),
+        TextSize = 24,
+        ZIndex = 102
+    })
+
+    -- Pulse animation on logo
+    task.spawn(function()
+        while LoadingLogo and LoadingLogo.Parent do
+            Tween(LoadingLogo, 0.8, {Size = UDim2.new(0, 55, 0, 55), Rotation = 5})
+            task.wait(0.8)
+            Tween(LoadingLogo, 0.8, {Size = UDim2.new(0, 50, 0, 50), Rotation = -5})
+            task.wait(0.8)
+        end
+    end)
 
     local LoadingTitle = Create("TextLabel", {
         Parent = LoadingFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 0, 0, 120),
+        Position = UDim2.new(0, 0, 0, 185),
         Size = UDim2.new(1, 0, 0, 30),
-        Font = Enum.Font.GothamBold,
+        Font = Enum.Font.GothamBlack,
         Text = Config.LoadingTitle or Config.Name,
         TextColor3 = Genim.Theme.TextColor,
-        TextSize = 24,
+        TextSize = 22,
         ZIndex = 101,
         TextTransparency = 0
     })
@@ -1346,7 +2263,8 @@ function Genim:CreateWindow(Config)
     Create("UIGradient", {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            ColorSequenceKeypoint.new(0.5, Genim.Theme.SecondaryAccent),
+            ColorSequenceKeypoint.new(1, Genim.Theme.AccentColor)
         }),
         Parent = LoadingTitle
     })
@@ -1354,49 +2272,67 @@ function Genim:CreateWindow(Config)
     local LoadingSubtitle = Create("TextLabel", {
         Parent = LoadingFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 0, 0, 150),
+        Position = UDim2.new(0, 0, 0, 215),
         Size = UDim2.new(1, 0, 0, 20),
         Font = Enum.Font.GothamMedium,
-        Text = Config.LoadingSubtitle or "Iniciando Genim...",
+        Text = Config.LoadingSubtitle or "Inicializando módulos...",
         TextColor3 = Genim.Theme.SecondaryTextColor,
-        TextSize = 14,
+        TextSize = 13,
         ZIndex = 101,
         TextTransparency = 0
     })
 
+    -- Loading progress bar with glow
     local ProgressBack = Create("Frame", {
         Parent = LoadingFrame,
-        BackgroundColor3 = Color3.fromRGB(30, 41, 59),
-        Position = UDim2.new(0.5, -100, 0, 200),
-        Size = UDim2.new(0, 200, 0, 4),
+        BackgroundColor3 = Color3.fromRGB(25, 30, 48),
+        AnchorPoint = Vector2.new(0.5, 0),
+        Position = UDim2.new(0.5, 0, 0, 260),
+        Size = UDim2.new(0, 240, 0, 5),
         ZIndex = 101
     })
-    
     Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = ProgressBack })
 
     local ProgressFill = Create("Frame", {
         Parent = ProgressBack,
-        BackgroundColor3 = Genim.Theme.AccentColor,
+        BackgroundColor3 = Color3.new(1, 1, 1),
         Size = UDim2.new(0, 0, 1, 0),
         ZIndex = 102
     })
-    
     Create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = ProgressFill })
     
-    Create("UIGradient", {
+    local progressGrad = Create("UIGradient", {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            ColorSequenceKeypoint.new(0.5, Genim.Theme.SecondaryAccent),
+            ColorSequenceKeypoint.new(1, Genim.Theme.AccentColor)
         }),
         Parent = ProgressFill
     })
+    AnimateGradient(progressGrad)
 
-    -- Toggle Logic
+    -- Loading percentage
+    local LoadingPercent = Create("TextLabel", {
+        Parent = LoadingFrame,
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2.new(0.5, 0),
+        Position = UDim2.new(0.5, 0, 0, 275),
+        Size = UDim2.new(0, 100, 0, 18),
+        Font = Enum.Font.GothamBold,
+        Text = "0%",
+        TextColor3 = Genim.Theme.SecondaryTextColor,
+        TextSize = 11,
+        ZIndex = 101
+    })
+
+    -- ═══════════════════════════════════════════════════════
+    -- TOGGLE / KEYBIND LOGIC
+    -- ═══════════════════════════════════════════════════════
     local Toggled = true
     local Debounce = false
     
     function Window:Toggle(state)
-        if LoadingFrame and LoadingFrame.Parent then return end -- Don't toggle while loading
+        if LoadingFrame and LoadingFrame.Parent then return end
         if Debounce then return end
         Debounce = true
         
@@ -1409,15 +2345,12 @@ function Genim:CreateWindow(Config)
         if Toggled then
             MainFrame.Visible = true
             MainFrame.Size = UDim2.new(0, 0, 0, 0)
-            Tween(MainFrame, 0.5, {Size = UDim2.new(0, 560, 0, 380)})
-            -- Intro sequence for aesthetics
-            task.spawn(function()
-                MainFrame.GroupTransparency = 1
-                Tween(MainFrame, 0.4, {GroupTransparency = 0})
-            end)
+            MainFrame.GroupTransparency = 1
+            TweenBounce(MainFrame, 0.5, {Size = Config.Size})
+            Tween(MainFrame, 0.3, {GroupTransparency = 0})
         else
-            Tween(MainFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0)})
-            task.delay(0.4, function()
+            Tween(MainFrame, 0.35, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
+            task.delay(0.35, function()
                 if not Toggled then MainFrame.Visible = false end
             end)
         end
@@ -1426,7 +2359,6 @@ function Genim:CreateWindow(Config)
         Debounce = false
     end
 
-    -- Keybind Listener
     Window.Keybind = Config.Keybind or Enum.KeyCode.K
     UserInputService.InputBegan:Connect(function(input, gpe)
         if not gpe and input.KeyCode == Window.Keybind then
@@ -1434,56 +2366,96 @@ function Genim:CreateWindow(Config)
         end
     end)
 
-    -- Mobile Toggle Button
+    -- ═══════════════════════════════════════════════════════
+    -- MOBILE TOGGLE
+    -- ═══════════════════════════════════════════════════════
     local MobileToggle = Create("TextButton", {
         Name = "MobileToggle",
         Parent = ScreenGui,
         BackgroundColor3 = Genim.Theme.MainColor,
         BorderSizePixel = 0,
-        Position = UDim2.new(0.5, -40, 0, 5),
-        Size = UDim2.new(0, 80, 0, 30),
-        Font = Enum.Font.GothamBold,
-        Text = "GENIM",
-        TextColor3 = Genim.Theme.TextColor,
-        TextSize = 12,
+        AnchorPoint = Vector2.new(0.5, 0),
+        Position = UDim2.new(0.5, 0, 0, 6),
+        Size = UDim2.new(0, 90, 0, 32),
+        Font = Enum.Font.GothamBlack,
+        Text = "⚡ GENIM",
+        TextColor3 = Color3.new(1, 1, 1),
+        TextSize = 11,
         ZIndex = 500,
-        AutoButtonColor = false
+        AutoButtonColor = false,
+        ClipsDescendants = true
     })
     
-    Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = MobileToggle })
-    Create("UIStroke", { Color = Genim.Theme.AccentColor, Thickness = 1.2, Parent = MobileToggle })
-    
-    local MobileGradient = Create("UIGradient", {
+    Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = MobileToggle })
+    local mStroke = Create("UIStroke", { 
+        Color = Color3.new(1,1,1), 
+        Thickness = 1.5, 
+        Parent = MobileToggle,
+        Transparency = 0.3
+    })
+    local mStrokeGrad = Create("UIGradient", {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
             ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
         }),
+        Parent = mStroke
+    })
+    AnimateGradient(mStrokeGrad)
+    
+    Create("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+        }),
+        Rotation = 90,
         Parent = MobileToggle
     })
 
     MobileToggle.MouseButton1Click:Connect(function()
-        Ripple(MobileToggle)
+        Ripple(MobileToggle, Color3.new(1,1,1))
         Window:Toggle()
     end)
 
-    -- Animate Loading Function
+    MakeDraggable(MobileToggle, MobileToggle)
+
+    -- ═══════════════════════════════════════════════════════
+    -- LOADING ANIMATION
+    -- ═══════════════════════════════════════════════════════
     local function StartLoading()
         task.spawn(function()
             MainFrame.Visible = true
-            Tween(MainFrame, 0.6, {
-                Size = UDim2.new(0, 560, 0, 380),
-                Position = UDim2.new(0.5, 0, 0.5, 0)
-            })
-            task.wait(0.6)
+            MainFrame.GroupTransparency = 1
+            TweenBounce(MainFrame, 0.6, {Size = Config.Size})
+            Tween(MainFrame, 0.4, {GroupTransparency = 0})
+            task.wait(0.3)
             
-            Tween(ProgressFill, 1.2, {Size = UDim2.new(1, 0, 1, 0)})
-            task.wait(1.5)
+            -- Animated loading with percentage
+            local steps = 20
+            for i = 1, steps do
+                local pct = i / steps
+                Tween(ProgressFill, 0.06, {Size = UDim2.new(pct, 0, 1, 0)})
+                LoadingPercent.Text = math.floor(pct * 100) .. "%"
+                
+                -- Change subtitle text at milestones
+                if i == 5 then LoadingSubtitle.Text = "Carregando componentes..." end
+                if i == 10 then LoadingSubtitle.Text = "Preparando interface..." end
+                if i == 15 then LoadingSubtitle.Text = "Quase pronto..." end
+                if i == steps then LoadingSubtitle.Text = "Concluído!" end
+                
+                task.wait(0.06)
+            end
             
+            task.wait(0.3)
+            
+            -- Fade out loading
             Tween(LoadingFrame, 0.5, {BackgroundTransparency = 1})
-            Tween(LoadingTitle, 0.5, {TextTransparency = 1})
-            Tween(LoadingSubtitle, 0.5, {TextTransparency = 1})
-            Tween(ProgressBack, 0.5, {BackgroundTransparency = 1})
-            Tween(ProgressFill, 0.5, {BackgroundTransparency = 1})
+            Tween(LoadingTitle, 0.4, {TextTransparency = 1})
+            Tween(LoadingSubtitle, 0.4, {TextTransparency = 1})
+            Tween(LoadingPercent, 0.4, {TextTransparency = 1})
+            Tween(ProgressBack, 0.4, {BackgroundTransparency = 1})
+            Tween(ProgressFill, 0.4, {BackgroundTransparency = 1})
+            Tween(LoadingLogo, 0.4, {BackgroundTransparency = 1})
+            Tween(LoadingLogoText, 0.4, {TextTransparency = 1})
             
             task.wait(0.5)
             LoadingFrame:Destroy()
@@ -1492,257 +2464,269 @@ function Genim:CreateWindow(Config)
                 Genim:Notify(Config.NotificationConfig or {
                     Title = "Genim Library",
                     Content = "Interface carregada com sucesso!",
-                    Duration = 5
+                    Duration = 5,
+                    Type = "Success"
                 })
             end
         end)
     end
 
+    -- ═══════════════════════════════════════════════════════
+    -- KEY SYSTEM
+    -- ═══════════════════════════════════════════════════════
     if KeySystem then
-        local KeyFrame = Create("Frame", {
+        local KeyFrame = Create("CanvasGroup", {
             Name = "KeyFrame",
             Parent = ScreenGui,
             BackgroundColor3 = Genim.Theme.MainColor,
             BorderSizePixel = 0,
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = UDim2.new(0.5, 0, 0.5, 0),
-            Size = UDim2.new(0, 320, 0, 180),
+            Size = UDim2.new(0, 350, 0, 220),
             ClipsDescendants = true
         })
         
-        Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = KeyFrame })
-        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1.2, Parent = KeyFrame })
+        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = KeyFrame })
+        local kfStroke = Create("UIStroke", { 
+            Color = Color3.new(1,1,1), 
+            Thickness = 1.5, 
+            Parent = KeyFrame,
+            Transparency = 0.4
+        })
+        local kfStrokeGrad = Create("UIGradient", {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            }),
+            Parent = kfStroke
+        })
+        AnimateGradient(kfStrokeGrad)
+        CreateShadow(KeyFrame, 0.5)
+
+        -- Key frame accent line
+        CreateGradientBar(KeyFrame, 2, UDim2.new(0, 0, 0, 45))
+
+        -- Key frame topbar
+        local KTopBar = Create("Frame", {
+            Parent = KeyFrame,
+            BackgroundColor3 = Genim.Theme.DarkerColor,
+            BorderSizePixel = 0,
+            Size = UDim2.new(1, 0, 0, 46)
+        })
+        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = KTopBar })
+        Create("Frame", {
+            Parent = KTopBar,
+            BackgroundColor3 = Genim.Theme.DarkerColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 0, 1, -14),
+            Size = UDim2.new(1, 0, 0, 14)
+        })
+
+        -- Lock icon
+        local LockIcon = Create("Frame", {
+            Parent = KTopBar,
+            BackgroundColor3 = Genim.Theme.AccentColor,
+            BackgroundTransparency = 0.85,
+            Position = UDim2.new(0, 14, 0.5, -13),
+            Size = UDim2.new(0, 26, 0, 26)
+        })
+        Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = LockIcon })
+        Create("TextLabel", {
+            Parent = LockIcon,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            Font = Enum.Font.GothamBold,
+            Text = "🔒",
+            TextSize = 13
+        })
+
+        Create("TextLabel", {
+            Parent = KTopBar,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 48, 0, 0),
+            Size = UDim2.new(1, -90, 1, 0),
+            Font = Enum.Font.GothamBold,
+            Text = KeySettings.Title or "Verificação Necessária",
+            TextColor3 = Genim.Theme.TextColor,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left
+        })
 
         local KClose = Create("TextButton", {
-            Name = "CloseButton",
-            Parent = KeyFrame,
+            Parent = KTopBar,
+            BackgroundColor3 = Genim.Theme.ElementColor,
             BackgroundTransparency = 1,
-            Position = UDim2.new(1, -30, 0, 5),
-            Size = UDim2.new(0, 25, 0, 25),
+            Position = UDim2.new(1, -38, 0.5, -13),
+            Size = UDim2.new(0, 26, 0, 26),
             Font = Enum.Font.GothamBold,
-            Text = "X",
+            Text = "✕",
             TextColor3 = Genim.Theme.SecondaryTextColor,
-            TextSize = 14,
+            TextSize = 11,
             AutoButtonColor = false
         })
+        Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = KClose })
 
         KClose.MouseEnter:Connect(function()
-            Tween(KClose, 0.2, {TextColor3 = Color3.fromRGB(255, 100, 100)})
+            Tween(KClose, 0.2, {BackgroundTransparency = 0.4, BackgroundColor3 = Color3.fromRGB(200, 50, 50), TextColor3 = Color3.new(1,1,1)})
         end)
-
         KClose.MouseLeave:Connect(function()
-            Tween(KClose, 0.2, {TextColor3 = Genim.Theme.SecondaryTextColor})
+            Tween(KClose, 0.2, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
         end)
-
         KClose.MouseButton1Click:Connect(function()
-            Ripple(KClose)
-
-            -- Confirmation dialog (same style as main window)
-            local KOverlay = Create("TextButton", {
-                Name = "KOverlay",
-                Parent = KeyFrame,
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 1, 0),
-                Text = "",
-                AutoButtonColor = false,
-                ZIndex = 200
-            })
-
-            local KDialog = Create("CanvasGroup", {
-                Parent = KOverlay,
-                BackgroundColor3 = Genim.Theme.MainColor,
-                BackgroundTransparency = 0.05,
-                BorderSizePixel = 0,
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                Position = UDim2.new(0.5, 0, 0.5, 0),
-                Size = UDim2.new(0, 0, 0, 0),
-                ClipsDescendants = true,
-                ZIndex = 201
-            })
-            Create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = KDialog })
-            local KDS = Create("UIStroke", { Color = Color3.new(1,1,1), Thickness = 1, Transparency = 0.5, Parent = KDialog })
-            Create("UIGradient", {
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
-                }),
-                Parent = KDS
-            })
-
-            Create("TextLabel", {
-                Parent = KDialog,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 15, 0, 15),
-                Size = UDim2.new(1, -30, 0, 20),
-                Font = Enum.Font.GothamBold,
-                Text = "Fechar Interface?",
-                TextColor3 = Genim.Theme.TextColor,
-                TextSize = 15,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 202
-            })
-            Create("TextLabel", {
-                Parent = KDialog,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 15, 0, 42),
-                Size = UDim2.new(1, -30, 0, 40),
-                Font = Enum.Font.GothamMedium,
-                Text = "Você tem certeza que deseja fechar o script?",
-                TextColor3 = Genim.Theme.SecondaryTextColor,
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                TextWrapped = true,
-                ZIndex = 202
-            })
-
-            local KBtnContainer = Create("Frame", {
-                Parent = KDialog,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 15, 1, -45),
-                Size = UDim2.new(1, -30, 0, 30),
-                ZIndex = 202
-            })
-            Create("UIListLayout", {
-                Parent = KBtnContainer,
-                FillDirection = Enum.FillDirection.Horizontal,
-                HorizontalAlignment = Enum.HorizontalAlignment.Right,
-                Padding = UDim.new(0, 10)
-            })
-
-            local function CloseKDialog()
-                Tween(KDialog, 0.25, {Size = UDim2.new(0, 0, 0, 0)})
-                Tween(KOverlay, 0.25, {BackgroundTransparency = 1})
-                task.wait(0.25)
-                KOverlay:Destroy()
-            end
-
-            -- "Sim" button
-            local YesBtn = Create("Frame", { Parent = KBtnContainer, BackgroundColor3 = Genim.Theme.AccentColor, BorderSizePixel = 0, Size = UDim2.new(0, 80, 1, 0), ZIndex = 203 })
-            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = YesBtn })
-            local YesTxt = Create("TextButton", { Parent = YesBtn, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), Font = Enum.Font.GothamBold, Text = "Sim", TextColor3 = Color3.new(1,1,1), TextSize = 12, AutoButtonColor = false, ZIndex = 204 })
-            YesTxt.MouseButton1Click:Connect(function()
-                Ripple(YesBtn)
-                CloseKDialog()
-                task.wait(0.25)
-                Tween(KeyFrame, 0.35, {Size = UDim2.new(0, 0, 0, 0)})
-                task.wait(0.35)
-                ScreenGui:Destroy()
-            end)
-
-            -- "Não" button
-            local NoBtn = Create("Frame", { Parent = KBtnContainer, BackgroundColor3 = Genim.Theme.DarkerColor, BorderSizePixel = 0, Size = UDim2.new(0, 80, 1, 0), ZIndex = 203 })
-            Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = NoBtn })
-            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = NoBtn })
-            local NoTxt = Create("TextButton", { Parent = NoBtn, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), Font = Enum.Font.GothamBold, Text = "Não", TextColor3 = Genim.Theme.TextColor, TextSize = 12, AutoButtonColor = false, ZIndex = 204 })
-            NoTxt.MouseButton1Click:Connect(function()
-                Ripple(NoBtn)
-                CloseKDialog()
-            end)
-
-            -- Animate dialog in
-            Tween(KOverlay, 0.3, {BackgroundTransparency = 0.5})
-            Tween(KDialog, 0.35, {Size = UDim2.new(0, 280, 0, 140)})
+            Tween(KeyFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
+            task.wait(0.4)
+            ScreenGui:Destroy()
         end)
 
-        local KTitle = Create("TextLabel", {
-            Parent = KeyFrame,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 0, 0, 20),
-            Size = UDim2.new(1, 0, 0, 25),
-            Font = Enum.Font.GothamBold,
-            Text = KeySettings.Title or "Verification Required",
-            TextColor3 = Genim.Theme.TextColor,
-            TextSize = 18
-        })
+        MakeDraggable(KTopBar, KeyFrame)
 
-        local KSubtitle = Create("TextLabel", {
+        Create("TextLabel", {
             Parent = KeyFrame,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 0, 0, 45),
-            Size = UDim2.new(1, 0, 0, 20),
+            Position = UDim2.new(0, 20, 0, 58),
+            Size = UDim2.new(1, -40, 0, 18),
             Font = Enum.Font.GothamMedium,
-            Text = KeySettings.Subtitle or "Join Discord to get the Key",
+            Text = KeySettings.Subtitle or "Entre com sua chave para acessar o script",
             TextColor3 = Genim.Theme.SecondaryTextColor,
-            TextSize = 12
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Left
         })
 
         local KInput = Create("TextBox", {
             Parent = KeyFrame,
             BackgroundColor3 = Genim.Theme.DarkerColor,
             BorderSizePixel = 0,
-            Position = UDim2.new(0.1, 0, 0.5, -15),
-            Size = UDim2.new(0.8, 0, 0, 35),
+            Position = UDim2.new(0, 20, 0, 90),
+            Size = UDim2.new(1, -40, 0, 36),
             Font = Enum.Font.GothamMedium,
-            PlaceholderText = "Enter key here...",
+            PlaceholderText = "Insira a chave aqui...",
             Text = "",
             TextColor3 = Genim.Theme.TextColor,
-            TextSize = 14
+            PlaceholderColor3 = Genim.Theme.SecondaryTextColor,
+            TextSize = 13
         })
-        
-        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = KInput })
-        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KInput })
+        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = KInput })
+        local kInputStroke = Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KInput })
+        Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), Parent = KInput })
+
+        KInput.Focused:Connect(function()
+            Tween(kInputStroke, 0.2, {Color = Genim.Theme.AccentColor})
+        end)
+        KInput.FocusLost:Connect(function()
+            Tween(kInputStroke, 0.2, {Color = Genim.Theme.StrokeColor})
+        end)
+
+        -- Status label
+        local StatusLabel = Create("TextLabel", {
+            Parent = KeyFrame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 20, 0, 130),
+            Size = UDim2.new(1, -40, 0, 16),
+            Font = Enum.Font.GothamMedium,
+            Text = "",
+            TextColor3 = Genim.Theme.ErrorColor,
+            TextSize = 11,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextTransparency = 1
+        })
 
         local VerifyBtn = Create("TextButton", {
             Parent = KeyFrame,
-            BackgroundColor3 = Genim.Theme.AccentColor,
+            BackgroundColor3 = Color3.new(1, 1, 1),
             BorderSizePixel = 0,
-            Position = UDim2.new(0.1, 0, 0.8, -10),
-            Size = UDim2.new(0.38, 0, 0, 30),
+            Position = UDim2.new(0, 20, 1, -55),
+            Size = UDim2.new(0.45, -10, 0, 36),
             Font = Enum.Font.GothamBold,
-            Text = "Verify",
+            Text = "Verificar",
             TextColor3 = Color3.new(1, 1, 1),
-            TextSize = 14,
-            AutoButtonColor = false
+            TextSize = 13,
+            AutoButtonColor = false,
+            ClipsDescendants = true
         })
-        
-        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = VerifyBtn })
+        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = VerifyBtn })
+        Create("UIGradient", {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+            }),
+            Rotation = 90,
+            Parent = VerifyBtn
+        })
 
         local GetKeyBtn = Create("TextButton", {
             Parent = KeyFrame,
-            BackgroundColor3 = Genim.Theme.DarkerColor,
+            BackgroundColor3 = Genim.Theme.ElementColor,
             BorderSizePixel = 0,
-            Position = UDim2.new(0.52, 0, 0.8, -10),
-            Size = UDim2.new(0.38, 0, 0, 30),
+            Position = UDim2.new(0.45, 10, 1, -55),
+            Size = UDim2.new(0.55, -30, 0, 36),
             Font = Enum.Font.GothamBold,
-            Text = "Get Key",
+            Text = "Obter Chave",
             TextColor3 = Genim.Theme.TextColor,
-            TextSize = 14,
-            AutoButtonColor = false
+            TextSize = 13,
+            AutoButtonColor = false,
+            ClipsDescendants = true
         })
-        
-        Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = GetKeyBtn })
+        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = GetKeyBtn })
         Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = GetKeyBtn })
 
-        MakeDraggable(KeyFrame, KeyFrame)
+        -- Hover effects
+        VerifyBtn.MouseEnter:Connect(function()
+            Tween(VerifyBtn, 0.15, {Size = UDim2.new(0.45, -8, 0, 38)})
+        end)
+        VerifyBtn.MouseLeave:Connect(function()
+            Tween(VerifyBtn, 0.15, {Size = UDim2.new(0.45, -10, 0, 36)})
+        end)
+        GetKeyBtn.MouseEnter:Connect(function()
+            Tween(GetKeyBtn, 0.15, {Size = UDim2.new(0.55, -28, 0, 38)})
+        end)
+        GetKeyBtn.MouseLeave:Connect(function()
+            Tween(GetKeyBtn, 0.15, {Size = UDim2.new(0.55, -30, 0, 36)})
+        end)
 
         VerifyBtn.MouseButton1Click:Connect(function()
-            Ripple(VerifyBtn)
+            Ripple(VerifyBtn, Color3.new(1,1,1))
             if KInput.Text == ValidKey then
-                Tween(KeyFrame, 0.5, {Size = UDim2.new(0, 0, 0, 0)})
+                StatusLabel.Text = "✓ Chave válida!"
+                StatusLabel.TextColor3 = Genim.Theme.SuccessColor
+                Tween(StatusLabel, 0.2, {TextTransparency = 0})
+                task.wait(0.5)
+                Tween(KeyFrame, 0.5, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
                 task.wait(0.5)
                 KeyFrame:Destroy()
                 StartLoading()
             else
+                StatusLabel.Text = "✕ Chave inválida! Tente novamente."
+                StatusLabel.TextColor3 = Genim.Theme.ErrorColor
+                Tween(StatusLabel, 0.2, {TextTransparency = 0})
+                
+                -- Shake animation
+                local orig = KeyFrame.Position
+                for _ = 1, 3 do
+                    Tween(KeyFrame, 0.04, {Position = orig + UDim2.new(0, 6, 0, 0)}, Enum.EasingStyle.Quad)
+                    task.wait(0.04)
+                    Tween(KeyFrame, 0.04, {Position = orig - UDim2.new(0, 6, 0, 0)}, Enum.EasingStyle.Quad)
+                    task.wait(0.04)
+                end
+                Tween(KeyFrame, 0.04, {Position = orig}, Enum.EasingStyle.Quad)
+                
                 KInput.Text = ""
-                KInput.PlaceholderText = "Invalid Key! Try again."
-                task.wait(1.5)
-                KInput.PlaceholderText = "Enter key here..."
+                task.wait(2)
+                Tween(StatusLabel, 0.3, {TextTransparency = 1})
             end
         end)
 
         GetKeyBtn.MouseButton1Click:Connect(function()
-            Ripple(GetKeyBtn)
+            Ripple(GetKeyBtn, Genim.Theme.AccentColor)
             if setclipboard then
                 setclipboard(KeySettings.Link or "https://discord.gg/example")
-                GetKeyBtn.Text = "Copied!"
-                task.wait(1)
-                GetKeyBtn.Text = "Get Key"
+                GetKeyBtn.Text = "✓ Copiado!"
+                task.wait(1.5)
+                GetKeyBtn.Text = "Obter Chave"
             else
                 print("Key Link: " .. (KeySettings.Link or "https://discord.gg/example"))
-                GetKeyBtn.Text = "Check Console"
-                task.wait(1)
-                GetKeyBtn.Text = "Get Key"
+                GetKeyBtn.Text = "Veja o Console"
+                task.wait(1.5)
+                GetKeyBtn.Text = "Obter Chave"
             end
         end)
     else
@@ -1752,16 +2736,34 @@ function Genim:CreateWindow(Config)
     return Window
 end
 
-
-
-
+-- ═══════════════════════════════════════════════════════
+-- NOTIFICATION SYSTEM (Enhanced)
+-- ═══════════════════════════════════════════════════════
 function Genim:Notify(Config)
     Config = Config or {}
     Config.Title = Config.Title or "Notification"
     Config.Content = Config.Content or "Content"
     Config.Duration = Config.Duration or 5
+    Config.Type = Config.Type or "Info" -- Info, Success, Warning, Error
     
     if not Genim.NotifyHolder then return end
+    
+    local typeColors = {
+        Info = Genim.Theme.InfoColor or Genim.Theme.AccentColor,
+        Success = Genim.Theme.SuccessColor or Color3.fromRGB(34, 197, 94),
+        Warning = Genim.Theme.WarningColor or Color3.fromRGB(250, 204, 21),
+        Error = Genim.Theme.ErrorColor or Color3.fromRGB(239, 68, 68)
+    }
+    
+    local typeIcons = {
+        Info = "ℹ",
+        Success = "✓",
+        Warning = "⚠",
+        Error = "✕"
+    }
+    
+    local accentColor = typeColors[Config.Type] or typeColors.Info
+    local icon = typeIcons[Config.Type] or typeIcons.Info
     
     local NotifyFrame = Create("CanvasGroup", {
         Name = "Notification",
@@ -1773,28 +2775,49 @@ function Genim:Notify(Config)
         GroupTransparency = 1
     })
     
-    Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = NotifyFrame })
+    Create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = NotifyFrame })
     
     local NotifyStroke = Create("UIStroke", {
-        Color = Color3.new(1, 1, 1),
-        Thickness = 1,
+        Color = accentColor,
+        Thickness = 1.5,
         Parent = NotifyFrame,
-        Transparency = 0.6
+        Transparency = 0.5
     })
     
-    Create("UIGradient", {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-            ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
-        }),
-        Parent = NotifyStroke
+    -- Accent bar on left side
+    local NotifyAccent = Create("Frame", {
+        Parent = NotifyFrame,
+        BackgroundColor3 = accentColor,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 0, 0, 0),
+        Size = UDim2.new(0, 4, 1, 0)
+    })
+    Create("UICorner", { CornerRadius = UDim.new(0, 4), Parent = NotifyAccent })
+
+    -- Icon
+    local IconFrame = Create("Frame", {
+        Parent = NotifyFrame,
+        BackgroundColor3 = accentColor,
+        BackgroundTransparency = 0.85,
+        Position = UDim2.new(0, 14, 0, 10),
+        Size = UDim2.new(0, 26, 0, 26)
+    })
+    Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = IconFrame })
+    Create("TextLabel", {
+        Parent = IconFrame,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, 0),
+        Font = Enum.Font.GothamBold,
+        Text = icon,
+        TextColor3 = accentColor,
+        TextSize = 14
     })
     
-    local Title = Create("TextLabel", {
+    local NTitle = Create("TextLabel", {
         Parent = NotifyFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 12, 0, 8),
-        Size = UDim2.new(1, -24, 0, 20),
+        Position = UDim2.new(0, 48, 0, 8),
+        Size = UDim2.new(1, -60, 0, 20),
         Font = Enum.Font.GothamBold,
         Text = Config.Title,
         TextColor3 = Genim.Theme.TextColor,
@@ -1802,11 +2825,11 @@ function Genim:Notify(Config)
         TextXAlignment = Enum.TextXAlignment.Left
     })
     
-    local Content = Create("TextLabel", {
+    local NContent = Create("TextLabel", {
         Parent = NotifyFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 12, 0, 28),
-        Size = UDim2.new(1, -24, 0, 0),
+        Position = UDim2.new(0, 48, 0, 28),
+        Size = UDim2.new(1, -60, 0, 0),
         Font = Enum.Font.GothamMedium,
         Text = Config.Content,
         TextColor3 = Genim.Theme.SecondaryTextColor,
@@ -1816,17 +2839,37 @@ function Genim:Notify(Config)
         TextWrapped = true
     })
 
+    -- Progress bar for duration
+    local ProgressBar = Create("Frame", {
+        Parent = NotifyFrame,
+        BackgroundColor3 = accentColor,
+        BackgroundTransparency = 0.5,
+        Position = UDim2.new(0, 0, 1, -3),
+        Size = UDim2.new(1, 0, 0, 3),
+        ZIndex = 2
+    })
+    Create("UICorner", { CornerRadius = UDim.new(0, 2), Parent = ProgressBar })
+
     -- Auto-Size based on content
-    local textHeight = game:GetService("TextService"):GetTextSize(Config.Content, 12, Enum.Font.GothamMedium, Vector2.new(276, 1000)).Y
-    local totalHeight = 40 + textHeight
+    local textHeight = TextService:GetTextSize(Config.Content, 12, Enum.Font.GothamMedium, Vector2.new(260, 1000)).Y
+    local totalHeight = 44 + textHeight
     
-    -- Animation In
-    Tween(NotifyFrame, 0.4, {Size = UDim2.new(1, 0, 0, totalHeight), GroupTransparency = 0})
+    -- Animation In (slide from right)
+    NotifyFrame.Position = UDim2.new(1, 20, 0, 0)
+    TweenBounce(NotifyFrame, 0.5, {Size = UDim2.new(1, 0, 0, totalHeight), Position = UDim2.new(0, 0, 0, 0)})
+    Tween(NotifyFrame, 0.3, {GroupTransparency = 0})
     
-    task.delay(Config.Duration, function()
+    -- Animate progress bar
+    task.delay(0.5, function()
+        Tween(ProgressBar, Config.Duration, {Size = UDim2.new(0, 0, 0, 3)}, Enum.EasingStyle.Linear)
+    end)
+    
+    task.delay(Config.Duration + 0.5, function()
         -- Animation Out
-        Tween(NotifyFrame, 0.4, {Size = UDim2.new(1, 0, 0, 0), GroupTransparency = 1})
+        Tween(NotifyFrame, 0.4, {Position = UDim2.new(1, 20, 0, 0), GroupTransparency = 1})
         task.wait(0.4)
+        Tween(NotifyFrame, 0.2, {Size = UDim2.new(1, 0, 0, 0)})
+        task.wait(0.2)
         NotifyFrame:Destroy()
     end)
 end
