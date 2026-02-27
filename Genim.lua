@@ -7,7 +7,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "1.27.7 (PREVIEW)"
+Genim.Version = "V1.27.7 (PREVIEW)"
 Genim.NotifyHolder = nil
 Genim.Plugins = {}
 
@@ -386,6 +386,12 @@ function Genim:CreateWindow(Config)
         Visible = false,
         GroupTransparency = 0
     })
+
+    local MainScale = Create("UIScale", {
+        Parent = MainFrame,
+        Scale = 1
+    })
+    Window.MainScale = MainScale
 
     Create("UICorner", {
         CornerRadius = UDim.new(0, 14),
@@ -2413,8 +2419,10 @@ function Genim:CreateWindow(Config)
         TextSize = 11,
         ZIndex = 500,
         AutoButtonColor = false,
-        ClipsDescendants = true
+        ClipsDescendants = true,
+        Visible = false
     })
+    Window.MobileToggle = MobileToggle
     
     Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = MobileToggle })
     local mStroke = Create("UIStroke", { 
@@ -2502,266 +2510,434 @@ function Genim:CreateWindow(Config)
     end
 
     -- ═══════════════════════════════════════════════════════
-    -- KEY SYSTEM
+    -- DEVICE SELECTION
     -- ═══════════════════════════════════════════════════════
-    if KeySystem then
-        local KeyFrame = Create("CanvasGroup", {
-            Name = "KeyFrame",
+    local function StartKeyOrLoading()
+        if KeySystem then
+            local KeyFrame = Create("CanvasGroup", {
+                Name = "KeyFrame",
+                Parent = ScreenGui,
+                BackgroundColor3 = Genim.Theme.MainColor,
+                BorderSizePixel = 0,
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                Size = UDim2.new(0, 350, 0, 220),
+                ClipsDescendants = true
+            })
+            
+            Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = KeyFrame })
+            local kfStroke = Create("UIStroke", { 
+                Color = Color3.new(1,1,1), 
+                Thickness = 1.5, 
+                Parent = KeyFrame,
+                Transparency = 0.4
+            })
+            local kfStrokeGrad = Create("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                }),
+                Parent = kfStroke
+            })
+            AnimateGradient(kfStrokeGrad)
+            CreateShadow(KeyFrame, 0.5)
+
+            -- Key frame accent line
+            CreateGradientBar(KeyFrame, 2, UDim2.new(0, 0, 0, 45))
+
+            -- Key frame topbar
+            local KTopBar = Create("Frame", {
+                Parent = KeyFrame,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Size = UDim2.new(1, 0, 0, 46)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = KTopBar })
+            Create("Frame", {
+                Parent = KTopBar,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 0, 1, -14),
+                Size = UDim2.new(1, 0, 0, 14)
+            })
+
+            -- Lock icon
+            local LockIcon = Create("Frame", {
+                Parent = KTopBar,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BackgroundTransparency = 0.85,
+                Position = UDim2.new(0, 14, 0.5, -13),
+                Size = UDim2.new(0, 26, 0, 26)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = LockIcon })
+            Create("TextLabel", {
+                Parent = LockIcon,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = "🔒",
+                TextSize = 13
+            })
+
+            Create("TextLabel", {
+                Parent = KTopBar,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 48, 0, 0),
+                Size = UDim2.new(1, -90, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = KeySettings.Title or "Verificação Necessária",
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local KClose = Create("TextButton", {
+                Parent = KTopBar,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(1, -38, 0.5, -13),
+                Size = UDim2.new(0, 26, 0, 26),
+                Font = Enum.Font.GothamBold,
+                Text = "✕",
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 11,
+                AutoButtonColor = false
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = KClose })
+
+            KClose.MouseEnter:Connect(function()
+                Tween(KClose, 0.2, {BackgroundTransparency = 0.4, BackgroundColor3 = Color3.fromRGB(200, 50, 50), TextColor3 = Color3.new(1,1,1)})
+            end)
+            KClose.MouseLeave:Connect(function()
+                Tween(KClose, 0.2, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
+            end)
+            KClose.MouseButton1Click:Connect(function()
+                Tween(KeyFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
+                task.wait(0.4)
+                ScreenGui:Destroy()
+            end)
+
+            MakeDraggable(KTopBar, KeyFrame)
+
+            Create("TextLabel", {
+                Parent = KeyFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 20, 0, 58),
+                Size = UDim2.new(1, -40, 0, 18),
+                Font = Enum.Font.GothamMedium,
+                Text = KeySettings.Subtitle or "Entre com sua chave para acessar o script",
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local KInput = Create("TextBox", {
+                Parent = KeyFrame,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 20, 0, 90),
+                Size = UDim2.new(1, -40, 0, 36),
+                Font = Enum.Font.GothamMedium,
+                PlaceholderText = "Insira a chave aqui...",
+                Text = "",
+                TextColor3 = Genim.Theme.TextColor,
+                PlaceholderColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 13
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = KInput })
+            local kInputStroke = Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KInput })
+            Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), Parent = KInput })
+
+            KInput.Focused:Connect(function()
+                Tween(kInputStroke, 0.2, {Color = Genim.Theme.AccentColor})
+            end)
+            KInput.FocusLost:Connect(function()
+                Tween(kInputStroke, 0.2, {Color = Genim.Theme.StrokeColor})
+            end)
+
+            -- Status label
+            local StatusLabel = Create("TextLabel", {
+                Parent = KeyFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 20, 0, 130),
+                Size = UDim2.new(1, -40, 0, 16),
+                Font = Enum.Font.GothamMedium,
+                Text = "",
+                TextColor3 = Genim.Theme.ErrorColor,
+                TextSize = 11,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTransparency = 1
+            })
+
+            local VerifyBtn = Create("TextButton", {
+                Parent = KeyFrame,
+                BackgroundColor3 = Color3.new(1, 1, 1),
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 20, 1, -55),
+                Size = UDim2.new(0.45, -10, 0, 36),
+                Font = Enum.Font.GothamBold,
+                Text = "Verificar",
+                TextColor3 = Color3.new(1, 1, 1),
+                TextSize = 13,
+                AutoButtonColor = false,
+                ClipsDescendants = true
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = VerifyBtn })
+            Create("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                }),
+                Rotation = 90,
+                Parent = VerifyBtn
+            })
+
+            local GetKeyBtn = Create("TextButton", {
+                Parent = KeyFrame,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0.45, 10, 1, -55),
+                Size = UDim2.new(0.55, -30, 0, 36),
+                Font = Enum.Font.GothamBold,
+                Text = "Obter Chave",
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 13,
+                AutoButtonColor = false,
+                ClipsDescendants = true
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = GetKeyBtn })
+            Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = GetKeyBtn })
+
+            -- Hover effects
+            VerifyBtn.MouseEnter:Connect(function()
+                Tween(VerifyBtn, 0.15, {Size = UDim2.new(0.45, -8, 0, 38)})
+            end)
+            VerifyBtn.MouseLeave:Connect(function()
+                Tween(VerifyBtn, 0.15, {Size = UDim2.new(0.45, -10, 0, 36)})
+            end)
+            GetKeyBtn.MouseEnter:Connect(function()
+                Tween(GetKeyBtn, 0.15, {Size = UDim2.new(0.55, -28, 0, 38)})
+            end)
+            GetKeyBtn.MouseLeave:Connect(function()
+                Tween(GetKeyBtn, 0.15, {Size = UDim2.new(0.55, -30, 0, 36)})
+            end)
+
+            VerifyBtn.MouseButton1Click:Connect(function()
+                Ripple(VerifyBtn, Color3.new(1,1,1))
+                if KInput.Text == ValidKey then
+                    StatusLabel.Text = "✓ Chave válida!"
+                    StatusLabel.TextColor3 = Genim.Theme.SuccessColor
+                    Tween(StatusLabel, 0.2, {TextTransparency = 0})
+                    task.wait(0.5)
+                    Tween(KeyFrame, 0.5, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
+                    task.wait(0.5)
+                    KeyFrame:Destroy()
+                    StartLoading()
+                else
+                    StatusLabel.Text = "✕ Chave inválida! Tente novamente."
+                    StatusLabel.TextColor3 = Genim.Theme.ErrorColor
+                    Tween(StatusLabel, 0.2, {TextTransparency = 0})
+                    
+                    -- Shake animation
+                    local orig = KeyFrame.Position
+                    for _ = 1, 3 do
+                        Tween(KeyFrame, 0.04, {Position = orig + UDim2.new(0, 6, 0, 0)}, Enum.EasingStyle.Quad)
+                        task.wait(0.04)
+                        Tween(KeyFrame, 0.04, {Position = orig - UDim2.new(0, 6, 0, 0)}, Enum.EasingStyle.Quad)
+                        task.wait(0.04)
+                    end
+                    Tween(KeyFrame, 0.04, {Position = orig}, Enum.EasingStyle.Quad)
+                    
+                    KInput.Text = ""
+                    task.wait(2)
+                    Tween(StatusLabel, 0.3, {TextTransparency = 1})
+                end
+            end)
+
+            GetKeyBtn.MouseButton1Click:Connect(function()
+                Ripple(GetKeyBtn, Genim.Theme.AccentColor)
+                if setclipboard then
+                    setclipboard(KeySettings.Link or "https://discord.gg/example")
+                    GetKeyBtn.Text = "✓ Copiado!"
+                    task.wait(1.5)
+                    GetKeyBtn.Text = "Obter Chave"
+                else
+                    print("Key Link: " .. (KeySettings.Link or "https://discord.gg/example"))
+                    GetKeyBtn.Text = "Veja o Console"
+                    task.wait(1.5)
+                    GetKeyBtn.Text = "Obter Chave"
+                end
+            end)
+        else
+            StartLoading()
+        end
+    end
+
+    local function ShowDeviceSelection()
+        local SelectionFrame = Create("CanvasGroup", {
+            Name = "DeviceSelection",
             Parent = ScreenGui,
             BackgroundColor3 = Genim.Theme.MainColor,
             BorderSizePixel = 0,
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = UDim2.new(0.5, 0, 0.5, 0),
-            Size = UDim2.new(0, 350, 0, 220),
+            Size = UDim2.new(0, 380, 0, 240),
             ClipsDescendants = true
         })
         
-        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = KeyFrame })
-        local kfStroke = Create("UIStroke", { 
+        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = SelectionFrame })
+        local sStroke = Create("UIStroke", { 
             Color = Color3.new(1,1,1), 
             Thickness = 1.5, 
-            Parent = KeyFrame,
+            Parent = SelectionFrame,
             Transparency = 0.4
         })
-        local kfStrokeGrad = Create("UIGradient", {
+        local sStrokeGrad = Create("UIGradient", {
             Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
                 ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
             }),
-            Parent = kfStroke
+            Parent = sStroke
         })
-        AnimateGradient(kfStrokeGrad)
-        CreateShadow(KeyFrame, 0.5)
+        AnimateGradient(sStrokeGrad)
+        CreateShadow(SelectionFrame, 0.5)
 
-        -- Key frame accent line
-        CreateGradientBar(KeyFrame, 2, UDim2.new(0, 0, 0, 45))
+        CreateGradientBar(SelectionFrame, 2, UDim2.new(0, 0, 0, 45))
 
-        -- Key frame topbar
-        local KTopBar = Create("Frame", {
-            Parent = KeyFrame,
+        local STopBar = Create("Frame", {
+            Parent = SelectionFrame,
             BackgroundColor3 = Genim.Theme.DarkerColor,
             BorderSizePixel = 0,
             Size = UDim2.new(1, 0, 0, 46)
         })
-        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = KTopBar })
+        Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = STopBar })
         Create("Frame", {
-            Parent = KTopBar,
+            Parent = STopBar,
             BackgroundColor3 = Genim.Theme.DarkerColor,
             BorderSizePixel = 0,
             Position = UDim2.new(0, 0, 1, -14),
             Size = UDim2.new(1, 0, 0, 14)
         })
 
-        -- Lock icon
-        local LockIcon = Create("Frame", {
-            Parent = KTopBar,
+        local DeviceIcon = Create("Frame", {
+            Parent = STopBar,
             BackgroundColor3 = Genim.Theme.AccentColor,
             BackgroundTransparency = 0.85,
             Position = UDim2.new(0, 14, 0.5, -13),
             Size = UDim2.new(0, 26, 0, 26)
         })
-        Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = LockIcon })
+        Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = DeviceIcon })
         Create("TextLabel", {
-            Parent = LockIcon,
+            Parent = DeviceIcon,
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 1, 0),
             Font = Enum.Font.GothamBold,
-            Text = "🔒",
+            Text = "📱",
             TextSize = 13
         })
 
         Create("TextLabel", {
-            Parent = KTopBar,
+            Parent = STopBar,
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 48, 0, 0),
-            Size = UDim2.new(1, -90, 1, 0),
+            Size = UDim2.new(1, -60, 1, 0),
             Font = Enum.Font.GothamBold,
-            Text = KeySettings.Title or "Verificação Necessária",
+            Text = "Selecione seu Dispositivo",
             TextColor3 = Genim.Theme.TextColor,
             TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left
         })
 
-        local KClose = Create("TextButton", {
-            Parent = KTopBar,
-            BackgroundColor3 = Genim.Theme.ElementColor,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(1, -38, 0.5, -13),
-            Size = UDim2.new(0, 26, 0, 26),
-            Font = Enum.Font.GothamBold,
-            Text = "✕",
-            TextColor3 = Genim.Theme.SecondaryTextColor,
-            TextSize = 11,
-            AutoButtonColor = false
-        })
-        Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = KClose })
-
-        KClose.MouseEnter:Connect(function()
-            Tween(KClose, 0.2, {BackgroundTransparency = 0.4, BackgroundColor3 = Color3.fromRGB(200, 50, 50), TextColor3 = Color3.new(1,1,1)})
-        end)
-        KClose.MouseLeave:Connect(function()
-            Tween(KClose, 0.2, {BackgroundTransparency = 1, TextColor3 = Genim.Theme.SecondaryTextColor})
-        end)
-        KClose.MouseButton1Click:Connect(function()
-            Tween(KeyFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
-            task.wait(0.4)
-            ScreenGui:Destroy()
-        end)
-
-        MakeDraggable(KTopBar, KeyFrame)
-
         Create("TextLabel", {
-            Parent = KeyFrame,
+            Parent = SelectionFrame,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 20, 0, 58),
+            Position = UDim2.new(0, 20, 0, 65),
             Size = UDim2.new(1, -40, 0, 18),
             Font = Enum.Font.GothamMedium,
-            Text = KeySettings.Subtitle or "Entre com sua chave para acessar o script",
+            Text = "Escolha como deseja visualizar a interface:",
             TextColor3 = Genim.Theme.SecondaryTextColor,
             TextSize = 12,
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Center
         })
 
-        local KInput = Create("TextBox", {
-            Parent = KeyFrame,
-            BackgroundColor3 = Genim.Theme.DarkerColor,
-            BorderSizePixel = 0,
-            Position = UDim2.new(0, 20, 0, 90),
-            Size = UDim2.new(1, -40, 0, 36),
-            Font = Enum.Font.GothamMedium,
-            PlaceholderText = "Insira a chave aqui...",
-            Text = "",
-            TextColor3 = Genim.Theme.TextColor,
-            PlaceholderColor3 = Genim.Theme.SecondaryTextColor,
-            TextSize = 13
-        })
-        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = KInput })
-        local kInputStroke = Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = KInput })
-        Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), Parent = KInput })
+        local function CreateDeviceBtn(name, icon, pos, deviceType)
+            local Btn = Create("TextButton", {
+                Parent = SelectionFrame,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BorderSizePixel = 0,
+                Position = pos,
+                Size = UDim2.new(0.5, -25, 0, 100),
+                Font = Enum.Font.GothamBold,
+                Text = "",
+                AutoButtonColor = false,
+                ClipsDescendants = true
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = Btn })
+            local bStroke = Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1.5, Parent = Btn })
 
-        KInput.Focused:Connect(function()
-            Tween(kInputStroke, 0.2, {Color = Genim.Theme.AccentColor})
-        end)
-        KInput.FocusLost:Connect(function()
-            Tween(kInputStroke, 0.2, {Color = Genim.Theme.StrokeColor})
-        end)
+            local IconLabel = Create("TextLabel", {
+                Parent = Btn,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0, 20),
+                Size = UDim2.new(1, 0, 0, 40),
+                Font = Enum.Font.GothamBold,
+                Text = icon,
+                TextSize = 35
+            })
 
-        -- Status label
-        local StatusLabel = Create("TextLabel", {
-            Parent = KeyFrame,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 20, 0, 130),
-            Size = UDim2.new(1, -40, 0, 16),
-            Font = Enum.Font.GothamMedium,
-            Text = "",
-            TextColor3 = Genim.Theme.ErrorColor,
-            TextSize = 11,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextTransparency = 1
-        })
+            local NameLabel = Create("TextLabel", {
+                Parent = Btn,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0, 65),
+                Size = UDim2.new(1, 0, 0, 20),
+                Font = Enum.Font.GothamBold,
+                Text = name,
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 14
+            })
 
-        local VerifyBtn = Create("TextButton", {
-            Parent = KeyFrame,
-            BackgroundColor3 = Color3.new(1, 1, 1),
-            BorderSizePixel = 0,
-            Position = UDim2.new(0, 20, 1, -55),
-            Size = UDim2.new(0.45, -10, 0, 36),
-            Font = Enum.Font.GothamBold,
-            Text = "Verificar",
-            TextColor3 = Color3.new(1, 1, 1),
-            TextSize = 13,
-            AutoButtonColor = false,
-            ClipsDescendants = true
-        })
-        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = VerifyBtn })
-        Create("UIGradient", {
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
-                ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
-            }),
-            Rotation = 90,
-            Parent = VerifyBtn
-        })
+            Btn.MouseEnter:Connect(function()
+                Tween(Btn, 0.2, {BackgroundColor3 = Genim.Theme.DarkerColor})
+                Tween(bStroke, 0.2, {Color = Genim.Theme.AccentColor})
+                Tween(IconLabel, 0.2, {TextSize = 40})
+            end)
+            Btn.MouseLeave:Connect(function()
+                Tween(Btn, 0.2, {BackgroundColor3 = Genim.Theme.ElementColor})
+                Tween(bStroke, 0.2, {Color = Genim.Theme.StrokeColor})
+                Tween(IconLabel, 0.2, {TextSize = 35})
+            end)
 
-        local GetKeyBtn = Create("TextButton", {
-            Parent = KeyFrame,
-            BackgroundColor3 = Genim.Theme.ElementColor,
-            BorderSizePixel = 0,
-            Position = UDim2.new(0.45, 10, 1, -55),
-            Size = UDim2.new(0.55, -30, 0, 36),
-            Font = Enum.Font.GothamBold,
-            Text = "Obter Chave",
-            TextColor3 = Genim.Theme.TextColor,
-            TextSize = 13,
-            AutoButtonColor = false,
-            ClipsDescendants = true
-        })
-        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = GetKeyBtn })
-        Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = GetKeyBtn })
-
-        -- Hover effects
-        VerifyBtn.MouseEnter:Connect(function()
-            Tween(VerifyBtn, 0.15, {Size = UDim2.new(0.45, -8, 0, 38)})
-        end)
-        VerifyBtn.MouseLeave:Connect(function()
-            Tween(VerifyBtn, 0.15, {Size = UDim2.new(0.45, -10, 0, 36)})
-        end)
-        GetKeyBtn.MouseEnter:Connect(function()
-            Tween(GetKeyBtn, 0.15, {Size = UDim2.new(0.55, -28, 0, 38)})
-        end)
-        GetKeyBtn.MouseLeave:Connect(function()
-            Tween(GetKeyBtn, 0.15, {Size = UDim2.new(0.55, -30, 0, 36)})
-        end)
-
-        VerifyBtn.MouseButton1Click:Connect(function()
-            Ripple(VerifyBtn, Color3.new(1,1,1))
-            if KInput.Text == ValidKey then
-                StatusLabel.Text = "✓ Chave válida!"
-                StatusLabel.TextColor3 = Genim.Theme.SuccessColor
-                Tween(StatusLabel, 0.2, {TextTransparency = 0})
-                task.wait(0.5)
-                Tween(KeyFrame, 0.5, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
-                task.wait(0.5)
-                KeyFrame:Destroy()
-                StartLoading()
-            else
-                StatusLabel.Text = "✕ Chave inválida! Tente novamente."
-                StatusLabel.TextColor3 = Genim.Theme.ErrorColor
-                Tween(StatusLabel, 0.2, {TextTransparency = 0})
+            Btn.MouseButton1Click:Connect(function()
+                Ripple(Btn, Genim.Theme.AccentColor)
+                Window.Device = deviceType
                 
-                -- Shake animation
-                local orig = KeyFrame.Position
-                for _ = 1, 3 do
-                    Tween(KeyFrame, 0.04, {Position = orig + UDim2.new(0, 6, 0, 0)}, Enum.EasingStyle.Quad)
-                    task.wait(0.04)
-                    Tween(KeyFrame, 0.04, {Position = orig - UDim2.new(0, 6, 0, 0)}, Enum.EasingStyle.Quad)
-                    task.wait(0.04)
+                -- Adapt UI based on device
+                if deviceType == "Mobile" then
+                    Config.Size = UDim2.new(0, 500, 0, 340)
+                    Window.MainScale.Scale = 1.1
+                    Window.MobileToggle.Visible = true
+                    MainFrame.Size = UDim2.new(0, 0, 0, 0) -- Reset for animation
+                else
+                    Window.MainScale.Scale = 1.0
+                    Window.MobileToggle.Visible = false
                 end
-                Tween(KeyFrame, 0.04, {Position = orig}, Enum.EasingStyle.Quad)
-                
-                KInput.Text = ""
-                task.wait(2)
-                Tween(StatusLabel, 0.3, {TextTransparency = 1})
-            end
-        end)
 
-        GetKeyBtn.MouseButton1Click:Connect(function()
-            Ripple(GetKeyBtn, Genim.Theme.AccentColor)
-            if setclipboard then
-                setclipboard(KeySettings.Link or "https://discord.gg/example")
-                GetKeyBtn.Text = "✓ Copiado!"
-                task.wait(1.5)
-                GetKeyBtn.Text = "Obter Chave"
-            else
-                print("Key Link: " .. (KeySettings.Link or "https://discord.gg/example"))
-                GetKeyBtn.Text = "Veja o Console"
-                task.wait(1.5)
-                GetKeyBtn.Text = "Obter Chave"
-            end
-        end)
-    else
-        StartLoading()
+                Tween(SelectionFrame, 0.4, {Size = UDim2.new(0, 0, 0, 0), GroupTransparency = 1})
+                task.wait(0.4)
+                SelectionFrame:Destroy()
+                StartKeyOrLoading()
+            end)
+        end
+
+        CreateDeviceBtn("PC / Desktop", "💻", UDim2.new(0, 20, 1, -135), "PC")
+        CreateDeviceBtn("Mobile / Celular", "📱", UDim2.new(0.5, 5, 1, -135), "Mobile")
+
+        -- Animate In
+        SelectionFrame.Size = UDim2.new(0, 0, 0, 0)
+        TweenBounce(SelectionFrame, 0.6, {Size = UDim2.new(0, 380, 0, 240)})
     end
+
+    ShowDeviceSelection()
 
     return Window
 end
