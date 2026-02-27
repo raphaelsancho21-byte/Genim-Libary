@@ -7,7 +7,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v2.0.0"
+Genim.Version = "1.27.7 (PREVIEW)"
 Genim.NotifyHolder = nil
 Genim.Plugins = {}
 
