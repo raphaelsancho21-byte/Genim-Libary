@@ -6,7 +6,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.3"
+Genim.Version = "v1.27.6"
 Genim.NotifyHolder = nil
 
 -- Services
@@ -156,6 +156,18 @@ end
 
 -- Library Methods
 
+function Genim:AddPlugin(Callback)
+    table.insert(Genim.Plugins, Callback)
+end
+
+function Genim:RunPlugins(Window)
+    for _, Callback in pairs(Genim.Plugins) do
+        task.spawn(function()
+            Callback(Window)
+        end)
+    end
+end
+
 function Genim:CreateWindow(Config)
 
     Config = Config or {}
@@ -197,9 +209,9 @@ function Genim:CreateWindow(Config)
         SortOrder = Enum.SortOrder.LayoutOrder
     })
     
-    Genim.NotifyHolder = NotifyHolder
-    
-    -- Main Container
+     Genim.NotifyHolder = NotifyHolder
+ 
+     -- Main Container
     local MainFrame = Create("CanvasGroup", {
         Name = "MainFrame",
         Parent = ScreenGui,
@@ -301,8 +313,7 @@ function Genim:CreateWindow(Config)
         AutoButtonColor = false
     })
 
-
-    CloseButton.MouseEnter:Connect(function()
+     CloseButton.MouseEnter:Connect(function()
         Tween(CloseButton, 0.2, {TextColor3 = Color3.fromRGB(255, 100, 100)})
     end)
 
@@ -559,10 +570,10 @@ function Genim:CreateWindow(Config)
             end)
         end
 
-        -- Animate In
-        Tween(Overlay, 0.3, {BackgroundTransparency = 0.5})
-        Tween(DialogFrame, 0.4, {Size = UDim2.new(0, 300, 0, 140)})
-    end
+         -- Animate In
+         Tween(Overlay, 0.3, {BackgroundTransparency = 0.5})
+         Tween(DialogFrame, 0.4, {Size = UDim2.new(0, 300, 0, 140)})
+     end
 
     -- Window properties already initialized
     
@@ -1416,9 +1427,9 @@ function Genim:CreateWindow(Config)
     end
 
     -- Keybind Listener
-    local Keybind = Config.Keybind or Enum.KeyCode.K
+    Window.Keybind = Config.Keybind or Enum.KeyCode.K
     UserInputService.InputBegan:Connect(function(input, gpe)
-        if not gpe and input.KeyCode == Keybind then
+        if not gpe and input.KeyCode == Window.Keybind then
             Window:Toggle()
         end
     end)
