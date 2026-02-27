@@ -7,7 +7,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "v1.27.8"
+Genim.Version = "v2.0.0"
 Genim.NotifyHolder = nil
 Genim.Plugins = {}
 
@@ -936,16 +936,32 @@ function Genim:CreateWindow(Config)
         })
         Create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = TabIconFrame })
 
-        local TabIconLabel = Create("TextLabel", {
-            Parent = TabIconFrame,
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 1, 0),
-            Font = Enum.Font.GothamBold,
-            Text = Icon or "◆",
-            TextColor3 = Genim.Theme.AccentColor,
-            TextSize = 11,
-            ZIndex = 3
-        })
+        local TabIconLabel;
+        local IsImage = (type(Icon) == "string" and (Icon:match("rbxassetid://") or Icon:match("http://") or Icon:match("https://") or tonumber(Icon))) or (type(Icon) == "number")
+         
+         if IsImage then
+             TabIconLabel = Create("ImageLabel", {
+                 Parent = TabIconFrame,
+                 BackgroundTransparency = 1,
+                 Size = UDim2.new(0, 14, 0, 14),
+                 AnchorPoint = Vector2.new(0.5, 0.5),
+                 Position = UDim2.new(0.5, 0, 0.5, 0),
+                 Image = (type(Icon) == "number" or tonumber(Icon)) and "rbxassetid://" .. tostring(Icon) or Icon,
+                 ImageColor3 = Genim.Theme.AccentColor,
+                 ZIndex = 3
+             })
+        else
+            TabIconLabel = Create("TextLabel", {
+                Parent = TabIconFrame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = Icon or "◆",
+                TextColor3 = Genim.Theme.AccentColor,
+                TextSize = 11,
+                ZIndex = 3
+            })
+        end
 
         local TabLabel = Create("TextLabel", {
             Name = "Label",
@@ -2134,8 +2150,14 @@ function Genim:CreateWindow(Config)
                 if OldLabel then Tween(OldLabel, 0.25, {TextColor3 = Genim.Theme.SecondaryTextColor}) end
                 if OldIconFrame then
                     Tween(OldIconFrame, 0.25, {BackgroundTransparency = 0.9})
-                    local iconLabel = OldIconFrame:FindFirstChildOfClass("TextLabel")
-                    if iconLabel then Tween(iconLabel, 0.25, {TextColor3 = Genim.Theme.AccentColor}) end
+                    local iconLabel = OldIconFrame:FindFirstChildOfClass("TextLabel") or OldIconFrame:FindFirstChildOfClass("ImageLabel")
+                    if iconLabel then
+                        if iconLabel:IsA("TextLabel") then
+                            Tween(iconLabel, 0.25, {TextColor3 = Genim.Theme.AccentColor})
+                        else
+                            Tween(iconLabel, 0.25, {ImageColor3 = Genim.Theme.AccentColor})
+                        end
+                    end
                 end
                 
                 local OldInd = OldBtn:FindFirstChild("Indicator")
@@ -2159,6 +2181,14 @@ function Genim:CreateWindow(Config)
             local iconFrame = TabButton:FindFirstChild("IconFrame")
             if iconFrame then
                 Tween(iconFrame, 0.25, {BackgroundTransparency = 0.75})
+                local iconLabel = iconFrame:FindFirstChildOfClass("TextLabel") or iconFrame:FindFirstChildOfClass("ImageLabel")
+                if iconLabel then
+                    if iconLabel:IsA("TextLabel") then
+                        Tween(iconLabel, 0.25, {TextColor3 = Color3.new(1, 1, 1)})
+                    else
+                        Tween(iconLabel, 0.25, {ImageColor3 = Color3.new(1, 1, 1)})
+                    end
+                end
             end
             
             TabIndicator.Visible = true
