@@ -7,7 +7,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "2.1.3"
+Genim.Version = "2.1.4"
 Genim.NotifyHolder = nil
 Genim.Plugins = {}
 
@@ -522,7 +522,7 @@ function Genim:CreateWindow(Config)
         Position = UDim2.new(0, 5, 0.5, -13),
         Size = UDim2.new(0, 26, 0, 26),
         Font = Enum.Font.GothamBold,
-        Text = "—",
+        Text = "-",
         TextColor3 = Genim.Theme.SecondaryTextColor,
         TextSize = 12,
         AutoButtonColor = false,
@@ -560,7 +560,7 @@ function Genim:CreateWindow(Config)
         Position = UDim2.new(1, -35, 0.5, -13),
         Size = UDim2.new(0, 26, 0, 26),
         Font = Enum.Font.GothamBold,
-        Text = "✕",
+        Text = "X",
         TextColor3 = Genim.Theme.SecondaryTextColor,
         TextSize = 11,
         AutoButtonColor = false,
@@ -2422,6 +2422,14 @@ function Genim:CreateWindow(Config)
         ClipsDescendants = true,
         Visible = false
     })
+    
+    -- Legibility stroke for text
+    Create("UIStroke", {
+        Parent = MobileToggle,
+        Color = Color3.new(0, 0, 0),
+        Thickness = 1,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    })
     Window.MobileToggle = MobileToggle
     
     Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = MobileToggle })
@@ -2682,6 +2690,15 @@ function Genim:CreateWindow(Config)
                 AutoButtonColor = false,
                 ClipsDescendants = true
             })
+            
+            -- Legibility stroke for text
+            Create("UIStroke", {
+                Parent = VerifyBtn,
+                Color = Color3.new(0, 0, 0),
+                Thickness = 1,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+            })
+            
             Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = VerifyBtn })
             Create("UIGradient", {
                 Color = ColorSequence.new({
@@ -2704,6 +2721,14 @@ function Genim:CreateWindow(Config)
                 TextSize = 13,
                 AutoButtonColor = false,
                 ClipsDescendants = true
+            })
+            
+            -- Legibility stroke for text
+            Create("UIStroke", {
+                Parent = GetKeyBtn,
+                Color = Color3.new(0, 0, 0),
+                Thickness = 1,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
             })
             Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = GetKeyBtn })
             Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = GetKeyBtn })
