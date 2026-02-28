@@ -2954,61 +2954,148 @@ function Genim:CreateWindow(Config)
             end)
         end
 
-        CreateDeviceBtn("PC / Desktop", "💻", UDim2.new(0, 20, 1, -135), "PC")
-        CreateDeviceBtn("Mobile / Celular", "📱", UDim2.new(0.5, 5, 1, -135), "Mobile")
+        CreateDeviceBtn("PC / Desktop", "💻", UDim2.new(0, 20, 0, 100), "PC")
+        CreateDeviceBtn("Mobile / Celular", "📱", UDim2.new(0.5, 5, 0, 100), "Mobile")
 
-        -- Animate In
-        SelectionFrame.Size = UDim2.new(0, 0, 0, 0)
-        TweenBounce(SelectionFrame, 0.6, {Size = UDim2.new(0, 380, 0, 240)})
-    end
-
-    ShowDeviceSelection()
-
-    -- ═══════════════════════════════════════════════════════
-    -- FEEDBACK SYSTEM
-    -- ═══════════════════════════════════════════════════════
-    function Window:CreateFeedbackTab(Config)
-        Config = Config or {}
-        Config.Name = Config.Name or "Feedback"
-        Config.Icon = Config.Icon or "💬"
-        Config.Webhook = Config.Webhook or "https://discord.com/api/webhooks/1477371755206152274/b8IySP129yEvRfZCY7eKGKjeYeyfiwe2hWV1VEXm2LxsLEjJBALObWqFtWnVp0VYoABr"
-
-        local FeedbackTab = Window:CreateTab(Config.Name, Config.Icon)
-        
-        FeedbackTab:CreateSection("Envio de Feedback")
-        
-        FeedbackTab:CreateParagraph({
-            Title = "Ajude-nos a Melhorar",
-            Content = "Use esta aba para enviar bugs que você encontrou ou sugestões para novas funcionalidades. Seu feedback é muito importante!"
+        -- Feedback Button
+        local FeedbackBtn = Create("TextButton", {
+            Name = "FeedbackBtn",
+            Parent = SelectionFrame,
+            BackgroundColor3 = Genim.Theme.ElementColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 20, 1, -55),
+            Size = UDim2.new(1, -40, 0, 36),
+            Font = Enum.Font.GothamBold,
+            Text = "💬 Send a Feedback or Bugs Reports",
+            TextColor3 = Genim.Theme.SecondaryTextColor,
+            TextSize = 12,
+            AutoButtonColor = false,
+            ClipsDescendants = true
         })
+        Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = FeedbackBtn })
+        local fbStroke = Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1.5, Parent = FeedbackBtn })
 
-        local FeedbackType = "Bug"
-        FeedbackTab:CreateDropdown({
-            Name = "Tipo de Feedback",
-            Options = {"Bug", "Sugestão", "Outro"},
-            CurrentOption = "Bug",
-            Callback = function(val)
-                FeedbackType = val
-            end
-        })
+        FeedbackBtn.MouseEnter:Connect(function()
+            Tween(FeedbackBtn, 0.2, {BackgroundColor3 = Genim.Theme.DarkerColor, TextColor3 = Genim.Theme.AccentColor})
+            Tween(fbStroke, 0.2, {Color = Genim.Theme.AccentColor})
+        end)
+        FeedbackBtn.MouseLeave:Connect(function()
+            Tween(FeedbackBtn, 0.2, {BackgroundColor3 = Genim.Theme.ElementColor, TextColor3 = Genim.Theme.SecondaryTextColor})
+            Tween(fbStroke, 0.2, {Color = Genim.Theme.StrokeColor})
+        end)
 
-        local Message = ""
-        FeedbackTab:CreateInput({
-            Name = "Mensagem",
-            Placeholder = "Descreva o bug ou sua sugestão aqui...",
-            Callback = function(val)
-                Message = val
-            end
-        })
+        FeedbackBtn.MouseButton1Click:Connect(function()
+            Ripple(FeedbackBtn, Genim.Theme.AccentColor)
+            
+            -- Simple Feedback Form Overlay
+            local FeedbackOverlay = Create("Frame", {
+                Name = "FeedbackOverlay",
+                Parent = SelectionFrame,
+                BackgroundColor3 = Genim.Theme.MainColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 0, 1, 0), -- Start from bottom
+                Size = UDim2.new(1, 0, 1, 0),
+                ZIndex = 10
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = FeedbackOverlay })
+            
+            local FOTopBar = Create("Frame", {
+                Parent = FeedbackOverlay,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Size = UDim2.new(1, 0, 0, 46)
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = FOTopBar })
+            Create("Frame", {
+                Parent = FOTopBar,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 0, 1, -14),
+                Size = UDim2.new(1, 0, 0, 14)
+            })
 
-        FeedbackTab:CreateButton({
-            Name = "Enviar Feedback",
-            Description = "Clique para enviar sua mensagem para nossa equipe.",
-            Callback = function()
+            Create("TextLabel", {
+                Parent = FOTopBar,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 20, 0, 0),
+                Size = UDim2.new(1, -60, 1, 0),
+                Font = Enum.Font.GothamBold,
+                Text = "Send Feedback",
+                TextColor3 = Genim.Theme.TextColor,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local CloseFO = Create("TextButton", {
+                Parent = FOTopBar,
+                BackgroundColor3 = Genim.Theme.ElementColor,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(1, -38, 0.5, -13),
+                Size = UDim2.new(0, 26, 0, 26),
+                Font = Enum.Font.GothamBold,
+                Text = "✕",
+                TextColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 11,
+                AutoButtonColor = false
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = CloseFO })
+            
+            CloseFO.MouseButton1Click:Connect(function()
+                Tween(FeedbackOverlay, 0.4, {Position = UDim2.new(0, 0, 1, 0)})
+                task.wait(0.4)
+                FeedbackOverlay:Destroy()
+            end)
+
+            local FInput = Create("TextBox", {
+                Parent = FeedbackOverlay,
+                BackgroundColor3 = Genim.Theme.DarkerColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 20, 0, 60),
+                Size = UDim2.new(1, -40, 0, 150),
+                Font = Enum.Font.GothamMedium,
+                PlaceholderText = "Describe the bug or your suggestion here...",
+                Text = "",
+                TextColor3 = Genim.Theme.TextColor,
+                PlaceholderColor3 = Genim.Theme.SecondaryTextColor,
+                TextSize = 12,
+                TextWrapped = true,
+                TextYAlignment = Enum.TextYAlignment.Top,
+                ClearTextOnFocus = false
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = FInput })
+            local fInputStroke = Create("UIStroke", { Color = Genim.Theme.StrokeColor, Thickness = 1, Parent = FInput })
+            Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), PaddingTop = UDim.new(0, 10), Parent = FInput })
+
+            local SendBtn = Create("TextButton", {
+                Parent = FeedbackOverlay,
+                BackgroundColor3 = Genim.Theme.AccentColor,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 20, 1, -55),
+                Size = UDim2.new(1, -40, 0, 36),
+                Font = Enum.Font.GothamBold,
+                Text = "Submit Feedback",
+                TextColor3 = Color3.new(1, 1, 1),
+                TextSize = 13,
+                AutoButtonColor = false,
+                ClipsDescendants = true
+            })
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = SendBtn })
+            Create("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Genim.Theme.AccentColor),
+                    ColorSequenceKeypoint.new(1, Genim.Theme.SecondaryAccent)
+                }),
+                Rotation = 90,
+                Parent = SendBtn
+            })
+
+            SendBtn.MouseButton1Click:Connect(function()
+                Ripple(SendBtn, Color3.new(1,1,1))
+                local Message = FInput.Text
                 if Message == "" or #Message < 5 then
                     Genim:Notify({
-                        Title = "Erro",
-                        Content = "Por favor, descreva seu feedback antes de enviar (mínimo 5 caracteres).",
+                        Title = "Error",
+                        Content = "Please describe your feedback (min 5 characters).",
                         Type = "Error"
                     })
                     return
@@ -3016,17 +3103,17 @@ function Genim:CreateWindow(Config)
 
                 local data = {
                     ["embeds"] = {{
-                        ["title"] = "Novo Feedback Recebido! (" .. FeedbackType .. ")",
+                        ["title"] = "New Feedback from Device Selection!",
                         ["description"] = Message,
-                        ["color"] = FeedbackType == "Bug" and 15158332 or (FeedbackType == "Sugestão" and 3066993 or 15105570),
+                        ["color"] = 15158332,
                         ["fields"] = {
                             {
-                                ["name"] = "Enviado por:",
+                                ["name"] = "Sent by:",
                                 ["value"] = Players.LocalPlayer.Name .. " (" .. Players.LocalPlayer.UserId .. ")",
                                 ["inline"] = true
                             },
                             {
-                                ["name"] = "Jogo:",
+                                ["name"] = "Game:",
                                 ["value"] = (function()
                                     local success, info = pcall(function() return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name end)
                                     return success and info or "Unknown Game"
@@ -3041,28 +3128,37 @@ function Genim:CreateWindow(Config)
                 }
 
                 local success, err = pcall(function()
-                    HttpService:PostAsync(Config.Webhook, HttpService:JSONEncode(data))
+                    HttpService:PostAsync("https://discord.com/api/webhooks/1477371755206152274/b8IySP129yEvRfZCY7eKGKjeYeyfiwe2hWV1VEXm2LxsLEjJBALObWqFtWnVp0VYoABr", HttpService:JSONEncode(data))
                 end)
 
                 if success then
                     Genim:Notify({
-                        Title = "Sucesso",
-                        Content = "Seu feedback foi enviado com sucesso! Obrigado.",
+                        Title = "Success",
+                        Content = "Feedback sent successfully!",
                         Type = "Success"
                     })
+                    Tween(FeedbackOverlay, 0.4, {Position = UDim2.new(0, 0, 1, 0)})
+                    task.wait(0.4)
+                    FeedbackOverlay:Destroy()
                 else
                     Genim:Notify({
-                        Title = "Erro ao Enviar",
-                        Content = "Ocorreu um erro ao enviar o feedback. Verifique se o HttpService está habilitado.",
+                        Title = "Error",
+                        Content = "Failed to send feedback. Check HttpService.",
                         Type = "Error"
                     })
-                    warn("Feedback Error: " .. tostring(err))
                 end
-            end
-        })
-        
-        return FeedbackTab
+            end)
+
+            -- Animate Overlay In
+            Tween(FeedbackOverlay, 0.5, {Position = UDim2.new(0, 0, 0, 0)}, Enum.EasingStyle.Quart)
+        end)
+
+        -- Animate In
+        SelectionFrame.Size = UDim2.new(0, 0, 0, 0)
+        TweenBounce(SelectionFrame, 0.6, {Size = UDim2.new(0, 380, 0, 300)})
     end
+
+    ShowDeviceSelection()
 
     return Window
 end
