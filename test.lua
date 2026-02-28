@@ -15,6 +15,22 @@ Genim.Plugins = {}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
+
+-- Request Function (Executor Compatible)
+local Request = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+
+function Genim:Request(Config)
+    if Request then
+        return Request(Config)
+    elseif HttpService then
+        if Config.Method == "POST" then
+            return HttpService:PostAsync(Config.Url, Config.Body, Enum.HttpContentType.ApplicationJson)
+        else
+            return HttpService:GetAsync(Config.Url)
+        end
+    end
+    error("No request function available (HttpService is disabled and no executor request function found).")
+end
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -3128,7 +3144,12 @@ function Genim:CreateWindow(Config)
                 }
 
                 local success, err = pcall(function()
-                    HttpService:PostAsync("https://discord.com/api/webhooks/1477371755206152274/b8IySP129yEvRfZCY7eKGKjeYeyfiwe2hWV1VEXm2LxsLEjJBALObWqFtWnVp0VYoABr", HttpService:JSONEncode(data))
+                    Genim:Request({
+                        Url = "https://discord.com/api/webhooks/1477371755206152274/b8IySP129yEvRfZCY7eKGKjeYeyfiwe2hWV1VEXm2LxsLEjJBALObWqFtWnVp0VYoABr",
+                        Method = "POST",
+                        Headers = {["Content-Type"] = "application/json"},
+                        Body = HttpService:JSONEncode(data)
+                    })
                 end)
 
                 if success then
@@ -3143,7 +3164,7 @@ function Genim:CreateWindow(Config)
                 else
                     Genim:Notify({
                         Title = "Error",
-                        Content = "Failed to send feedback. Check HttpService.",
+                        Content = "Failed to send feedback. Executor error.",
                         Type = "Error"
                     })
                 end
@@ -3159,6 +3180,111 @@ function Genim:CreateWindow(Config)
     end
 
     ShowDeviceSelection()
+
+    -- ═══════════════════════════════════════════════════════
+    -- FEEDBACK SYSTEM
+    -- ═══════════════════════════════════════════════════════
+    function Window:CreateFeedbackTab(Config)
+        Config = Config or {}
+        Config.Name = Config.Name or "Feedback"
+        Config.Icon = Config.Icon or "💬"
+        Config.Webhook = Config.Webhook or "https://discord.com/api/webhooks/1477371755206152274/b8IySP129yEvRfZCY7eKGKjeYeyfiwe2hWV1VEXm2LxsLEjJBALObWqFtWnVp0VYoABr"
+
+        local FeedbackTab = Window:CreateTab(Config.Name, Config.Icon)
+        
+        FeedbackTab:CreateSection("Envio de Feedback")
+        
+        FeedbackTab:CreateParagraph({
+            Title = "Ajude-nos a Melhorar",
+            Content = "Use esta aba para enviar bugs que você encontrou ou sugestões para novas funcionalidades. Seu feedback é muito importante!"
+        })
+
+        local FeedbackType = "Bug"
+        FeedbackTab:CreateDropdown({
+            Name = "Tipo de Feedback",
+            Options = {"Bug", "Sugestão", "Outro"},
+            CurrentOption = "Bug",
+            Callback = function(val)
+                FeedbackType = val
+            end
+        })
+
+        local Message = ""
+        FeedbackTab:CreateInput({
+            Name = "Mensagem",
+            Placeholder = "Descreva o bug ou sua sugestão aqui...",
+            Callback = function(val)
+                Message = val
+            end
+        })
+
+        FeedbackTab:CreateButton({
+            Name = "Enviar Feedback",
+            Description = "Clique para enviar sua mensagem para nossa equipe.",
+            Callback = function()
+                if Message == "" or #Message < 5 then
+                    Genim:Notify({
+                        Title = "Erro",
+                        Content = "Por favor, descreva seu feedback antes de enviar (mínimo 5 caracteres).",
+                        Type = "Error"
+                    })
+                    return
+                end
+
+                local data = {
+                    ["embeds"] = {{
+                        ["title"] = "Novo Feedback Recebido! (" .. FeedbackType .. ")",
+                        ["description"] = Message,
+                        ["color"] = FeedbackType == "Bug" and 15158332 or (FeedbackType == "Sugestão" and 3066993 or 15105570),
+                        ["fields"] = {
+                            {
+                                ["name"] = "Enviado por:",
+                                ["value"] = Players.LocalPlayer.Name .. " (" .. Players.LocalPlayer.UserId .. ")",
+                                ["inline"] = true
+                            },
+                            {
+                                ["name"] = "Jogo:",
+                                ["value"] = (function()
+                                    local success, info = pcall(function() return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name end)
+                                    return success and info or "Unknown Game"
+                                end)() .. " (" .. game.PlaceId .. ")",
+                                ["inline"] = true
+                            }
+                        },
+                        ["footer"] = {
+                            ["text"] = "Genim Feedback System • " .. os.date("%X")
+                        }
+                    }}
+                }
+
+                local success, err = pcall(function()
+                    Genim:Request({
+                        Url = Config.Webhook,
+                        Method = "POST",
+                        Headers = {["Content-Type"] = "application/json"},
+                        Body = HttpService:JSONEncode(data)
+                    })
+                end)
+
+                if success then
+                    Genim:Notify({
+                        Title = "Sucesso",
+                        Content = "Seu feedback foi enviado com sucesso! Obrigado.",
+                        Type = "Success"
+                    })
+                else
+                    Genim:Notify({
+                        Title = "Erro ao Enviar",
+                        Content = "Ocorreu um erro ao enviar o feedback. Executor error.",
+                        Type = "Error"
+                    })
+                    warn("Feedback Error: " .. tostring(err))
+                end
+            end
+        })
+        
+        return FeedbackTab
+    end
 
     return Window
 end
