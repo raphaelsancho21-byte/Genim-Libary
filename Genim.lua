@@ -7,7 +7,7 @@
 ]]
 
 local Genim = {}
-Genim.Version = "V1.27.7 (PREVIEW)"
+Genim.Version = "2.1.3"
 Genim.NotifyHolder = nil
 Genim.Plugins = {}
 
@@ -544,10 +544,10 @@ function Genim:CreateWindow(Config)
         Ripple(MinButton, Genim.Theme.WarningColor)
         if not Minimized then
             Minimized = true
-            Tween(MainFrame, 0.4, {Size = UDim2.new(0, OriginalSize.X.Offset, 0, 48)})
+            Tween(MainFrame, 0.4, {Size = UDim2.new(0, Config.Size.X.Offset, 0, 48)})
         else
             Minimized = false
-            Tween(MainFrame, 0.4, {Size = OriginalSize})
+            Tween(MainFrame, 0.4, {Size = Config.Size})
         end
     end)
 
